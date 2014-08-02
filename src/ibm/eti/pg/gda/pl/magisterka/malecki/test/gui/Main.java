@@ -12,23 +12,18 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Graphics;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Image;
-import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.awt.event.HierarchyBoundsListener;
 import java.awt.event.HierarchyEvent;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -39,12 +34,10 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 
 /**
  *
@@ -62,7 +55,7 @@ public class Main {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws IOException {
-        Main main = new Main();
+        new Main();
     }
     private JLabel heartRate;
     private Image heart1;
@@ -76,6 +69,10 @@ public class Main {
     private JSeparator menuSeparator;
     private JPanel menu;
     private JPanel menu2;
+    private JLabel clockLabel;
+    private long time;
+    private JLabel powerLabel;
+    private JLabel timeLabel;
     
     public Main() throws IOException {
         frame = new JFrame("Test");
@@ -99,8 +96,10 @@ public class Main {
             @Override
             public void ancestorResized(HierarchyEvent e) {
                 
+                menu2.setPreferredSize(new Dimension(100, menu.getHeight()));
+                menuSeparator.setPreferredSize(new Dimension(2, menu.getHeight()));
                 menu2.setSize(new Dimension(100, menu.getHeight()));
-                menuSeparator.setSize(new Dimension(2, menu.getHeight()));
+                menuSeparator.setPreferredSize(new Dimension(2, menu.getHeight()));
                 
                 monitor.setPreferredSize(new Dimension(frame.getWidth()-115, 100));
                 panel.setPreferredSize(new Dimension(frame.getWidth()-115, 100));
@@ -108,6 +107,9 @@ public class Main {
         });
         
         frame.setVisible(true);
+        
+        MonitorUpdater mU = new MonitorUpdater();
+        mU.start();
     }
     
     public static void setFullScreen(JFrame frame, boolean fullScreen) {
@@ -164,7 +166,7 @@ public class Main {
             }
         };
         menu2 = new JPanel();
-//        menu2.setBackground(Color.red);
+        menu2.setBackground(Color.red);
         menu2.setPreferredSize(new Dimension(menuSize, 450));
         
         JButton startButton = new JButton("Start");
@@ -215,7 +217,7 @@ public class Main {
         monitor = new JPanel();
         monitor.setLayout(new FlowLayout(FlowLayout.LEFT));
         //monitor.setLayout(new GridLayout(1, 2));
-//        monitor.setBackground(Color.WHITE);
+        monitor.setBackground(Color.WHITE);
         //monitor.setPreferredSize(new Dimension(500, 100));
         monitor.setBorder(BorderFactory.createEmptyBorder(-5,10,0,0));
         monitor.setPreferredSize(new Dimension((int)dim.getWidth()-115, 100));
@@ -226,11 +228,7 @@ public class Main {
         heartRate.setPreferredSize(new Dimension(150, 100));
         heartRate.setFont(heartRate.getFont().deriveFont(100.0f));
         monitor.add(heartRate);
-        
-        JSeparator separator = new JSeparator(SwingConstants.VERTICAL);
-        separator.setPreferredSize(new Dimension(2, 100));
-        monitor.add(separator);
-        
+                
         Image img = ImageIO.read(getClass().getResource("resources/heart1.png"));
         heart1 = img.getScaledInstance(80,80, 0);
         img = ImageIO.read(getClass().getResource("resources/heart2.png"));
@@ -240,8 +238,39 @@ public class Main {
         heart.setPreferredSize(new Dimension(100, 100));
         monitor.add(heart);
         
+        JSeparator separator = new JSeparator(SwingConstants.VERTICAL);
+        separator.setPreferredSize(new Dimension(2, 100));
+        monitor.add(separator);
+  
+        powerLabel = new JLabel("0W");
+        powerLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+        powerLabel.setPreferredSize(new Dimension(270, 100));
+        powerLabel.setFont(powerLabel.getFont().deriveFont(100.0f));
+        monitor.add(powerLabel);
+        
         separator = new JSeparator(SwingConstants.VERTICAL);
-        separator.setPreferredSize(new Dimension(10, 100));
+        separator.setPreferredSize(new Dimension(2, 100));
+        monitor.add(separator);
+        
+        timeLabel = new JLabel("0:00");
+        timeLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        timeLabel.setPreferredSize(new Dimension(290, 100));
+        timeLabel.setFont(timeLabel.getFont().deriveFont(100.0f));
+        monitor.add(timeLabel);
+        
+        separator = new JSeparator(SwingConstants.VERTICAL);
+        separator.setPreferredSize(new Dimension(2, 100));
+        monitor.add(separator);
+        
+        SimpleDateFormat ft = new SimpleDateFormat ("HH:mm");
+        clockLabel = new JLabel(ft.format(new Date()));
+        clockLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        clockLabel.setPreferredSize(new Dimension(290, 100));
+        clockLabel.setFont(clockLabel.getFont().deriveFont(100.0f));
+        monitor.add(clockLabel);
+        
+        separator = new JSeparator(SwingConstants.VERTICAL);
+        separator.setPreferredSize(new Dimension(2, 100));
         monitor.add(separator);
         
         separator = new JSeparator();
@@ -332,5 +361,37 @@ public class Main {
                 }
             }
         }
+    }
+    
+    private class MonitorUpdater extends Thread {
+        private SimpleDateFormat ft = new SimpleDateFormat ("HH:mm");
+        
+        @Override
+        public void run() {
+            time = System.currentTimeMillis();
+            int i=0;
+            while(true) {
+                long now = System.currentTimeMillis()-time;
+                int sec = (int)(TimeUnit.MILLISECONDS.toSeconds(now) - 
+                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(now)));
+                String timer;
+                if (sec<10) {
+                    timer = TimeUnit.MILLISECONDS.toMinutes(now) + ":0" + sec; 
+                } else {
+                    timer = TimeUnit.MILLISECONDS.toMinutes(now) + ":" + sec; 
+                }
+                    
+                clockLabel.setText(ft.format(new Date()));
+                timeLabel.setText(timer);
+                powerLabel.setText(i+"W");
+                i++;
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+        
     }
 }
