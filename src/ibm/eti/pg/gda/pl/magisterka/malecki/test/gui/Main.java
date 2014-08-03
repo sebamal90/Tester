@@ -6,6 +6,7 @@ package ibm.eti.pg.gda.pl.magisterka.malecki.test.gui;
 
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.api.BTDeviceResource;
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.api.MessageResource;
+import ibm.eti.pg.gda.pl.magisterka.malecki.test.api.TestResource;
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.core.Config;
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.core.device.Message;
 import java.awt.BorderLayout;
@@ -48,6 +49,7 @@ public class Main {
     private static JFrame frame;
     private MessageResource messageResource = new MessageResource(this);
     private BTDeviceResource btdeviceResource = new BTDeviceResource(this);
+    private TestResource testResource = new TestResource(this);
     private JTextArea logger = new javax.swing.JTextArea();
 
 
@@ -73,6 +75,9 @@ public class Main {
     private long time;
     private JLabel powerLabel;
     private JLabel timeLabel;
+    private boolean connectionEstabilished;
+    private JButton startStopButton;
+    private JButton pauseResumeButton;
     
     public Main() throws IOException {
         frame = new JFrame("Test");
@@ -155,29 +160,45 @@ public class Main {
             public void actionPerformed(ActionEvent e) {
                 String action = e.getActionCommand();
                 if (action.equals("Start")) {
-                    System.exit(0);
+                    if (connectionEstabilished) {
+                        testResource.startTest();
+                        startStopButton.setText("End");
+                        pauseResumeButton.setEnabled(true);
+                    }
+                    else {
+                        System.out.println("Don't connected with hr Listener");
+                    }
                 } else if (action.equals("End")) {
                     System.exit(0);
-                } else if (action.equals("Stats")) {
+                } else if (action.equals("Pause")) {
+                    testResource.pauseTest();
+                    pauseResumeButton.setText("Resume");
+                } else if (action.equals("Resume")) {
+                    testResource.resumeTest();
+                    pauseResumeButton.setText("Pause");
+                }
+                else if (action.equals("Stats")) {
                     btdeviceResource.getDevices();
                 } else if (action.equals("Connect")) {
                     btdeviceResource.connect(Config.deviceAddress, Config.deviceType);
-                }
+                } 
             }
         };
+        
         menu2 = new JPanel();
-        menu2.setBackground(Color.red);
+//        menu2.setBackground(Color.red);
         menu2.setPreferredSize(new Dimension(menuSize, 450));
         
-        JButton startButton = new JButton("Start");
-        startButton.setPreferredSize(new Dimension(menuSize, menuSize));
-        startButton.addActionListener(menuListener); 
-        menu2.add(startButton);
+        startStopButton = new JButton("Start");
+        startStopButton.setPreferredSize(new Dimension(menuSize, menuSize));
+        startStopButton.addActionListener(menuListener); 
+        menu2.add(startStopButton);
         
-        JButton endButton = new JButton("End");
-        endButton.setPreferredSize(new Dimension(menuSize, menuSize));
-        endButton.addActionListener(menuListener);  
-        menu2.add(endButton);
+        pauseResumeButton = new JButton("Pause");
+        pauseResumeButton.setPreferredSize(new Dimension(menuSize, menuSize/2));
+        pauseResumeButton.addActionListener(menuListener); 
+        pauseResumeButton.setEnabled(false);
+        menu2.add(pauseResumeButton);
         
         JButton statsButton = new JButton("Stats");
         statsButton.setPreferredSize(new Dimension(menuSize, menuSize));
@@ -217,7 +238,7 @@ public class Main {
         monitor = new JPanel();
         monitor.setLayout(new FlowLayout(FlowLayout.LEFT));
         //monitor.setLayout(new GridLayout(1, 2));
-        monitor.setBackground(Color.WHITE);
+ //       monitor.setBackground(Color.WHITE);
         //monitor.setPreferredSize(new Dimension(500, 100));
         monitor.setBorder(BorderFactory.createEmptyBorder(-5,10,0,0));
         monitor.setPreferredSize(new Dimension((int)dim.getWidth()-115, 100));
@@ -304,12 +325,18 @@ public class Main {
     }
 
     public void connectionEstabilished() {
+        System.out.println("Connection estabilished");
         hb = new HeartBeat();
+        connectionEstabilished = true;
         Thread t = new Thread((Runnable)hb);
         t.start();
     }    
     
-    private class HeartBeat implements Runnable{
+    public HeartBeat getHeartBeat() {
+        return hb;
+    }
+    
+    public class HeartBeat implements Runnable{
         private int HR;
         private Message lastMessage;
         
@@ -346,20 +373,23 @@ public class Main {
         }
         
         public void setHR() {
-            if (System.currentTimeMillis()-lastMessage.getTime() > 3000) {
-                Message message = messageResource.getLastMessage();
+            Message message = messageResource.getLastMessage();
 
-                if (message !=null) {
-                    if (message.getTime() == lastMessage.getTime()) {
-                        HR = (int)(HR *0.8) ;
-                        heartRate.setText(HR+"!");
-                    } else {
-                        lastMessage = message;
-                        HR = lastMessage.getHr();
-                        heartRate.setText(HR+"");
-                    }
+            if (message !=null) {
+                if (message.getTime() == lastMessage.getTime() 
+                    && System.currentTimeMillis()-lastMessage.getTime() > 3000) {
+                    HR = (int)(HR *0.8) ;
+                    heartRate.setText(HR+"!");
+                } else {
+                    lastMessage = message;
+                    HR = lastMessage.getHr();
+                    heartRate.setText(HR+"");
                 }
             }
+        }
+        
+        public int getHR() {
+            return HR;
         }
     }
     
@@ -368,21 +398,12 @@ public class Main {
         
         @Override
         public void run() {
-            time = System.currentTimeMillis();
             int i=0;
-            while(true) {
-                long now = System.currentTimeMillis()-time;
-                int sec = (int)(TimeUnit.MILLISECONDS.toSeconds(now) - 
-                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(now)));
-                String timer;
-                if (sec<10) {
-                    timer = TimeUnit.MILLISECONDS.toMinutes(now) + ":0" + sec; 
-                } else {
-                    timer = TimeUnit.MILLISECONDS.toMinutes(now) + ":" + sec; 
-                }
-                    
+            while(true) {                   
                 clockLabel.setText(ft.format(new Date()));
-                timeLabel.setText(timer);
+                if (testResource.getTestStatus()) {
+                    timeLabel.setText(testResource.getTimer());
+                }
                 powerLabel.setText(i+"W");
                 i++;
                 try {

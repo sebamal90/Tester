@@ -18,7 +18,7 @@ import javax.microedition.io.StreamConnection;
  */
 public class MessageReader implements Runnable{
 
-    private boolean debug = true;
+    private boolean debug = false;
     private StreamConnection connection;
     private Message message;
     private boolean read = true;
