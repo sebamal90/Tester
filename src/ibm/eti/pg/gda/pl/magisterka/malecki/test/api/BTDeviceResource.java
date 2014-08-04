@@ -37,7 +37,7 @@ public class BTDeviceResource {
         Connect connect = new Connect(deviceAddress, deviceType);
         connect.start();
     }
-
+    
     private class ConnectByFriendlyName extends Thread {
         private String deviceFriendlyName;
         private String deviceType;

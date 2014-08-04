@@ -80,6 +80,7 @@ public class Main {
     private boolean connectionEstabilished;
     private JButton startStopButton;
     private JButton pauseResumeButton;
+    private JButton connectButton;
     
     public Main() throws IOException {
         frame = new JFrame("Test");
@@ -115,7 +116,7 @@ public class Main {
         
         frame.setVisible(true);
     }
-        
+    
     public static void setFullScreen(JFrame frame, boolean fullScreen) {
         frame.dispose();
         frame.setResizable(!fullScreen);
@@ -180,6 +181,14 @@ public class Main {
                     btdeviceResource.getDevices();
                 } else if (action.equals("Connect")) {
                     btdeviceResource.connect(Config.deviceAddress, Config.deviceType);
+                    connectButton.setText("Disconnect");
+                } else if (action.equals("Disconnect")) {
+                    messageResource.stopRead();
+                    connectButton.setText("Connect");
+                    hb.stopRead();
+                } else if (action.equals("Reconnect")) {
+                    messageResource.stopRead();
+                    btdeviceResource.connect(Config.deviceAddress, Config.deviceType);
                 } 
             }
         };
@@ -205,7 +214,7 @@ public class Main {
         statsButton.addActionListener(menuListener);
         menu2.add(statsButton);
         
-        JButton connectButton = new JButton("Connect");
+        connectButton = new JButton("Connect");
         connectButton.setPreferredSize(new Dimension(menuSize, menuSize));
         connectButton.addActionListener(menuListener);
         menu2.add(connectButton);
@@ -228,11 +237,11 @@ public class Main {
         logger.setEditable(false);
         scrollPane.setViewportView(logger);
         
-        //MessageConsole mc = new MessageConsole(logger);
-        //mc.redirectOut();
-        //mc.redirectErr(Color.RED, null);
-        //mc.setMessageLines(100);
-    
+        MessageConsole mc = new MessageConsole(logger);
+        mc.redirectOut();
+        mc.redirectErr(Color.RED, null);
+        mc.setMessageLines(100);
+   
     }
     
     private void addWorker() throws IOException {
@@ -242,7 +251,7 @@ public class Main {
         monitor = new Monitor(testResource);
         monitor.setPreferredSize(new Dimension((int)dim.getWidth()-115, 100));
         worker.add(monitor, BorderLayout.NORTH);
-               
+           
         JSeparator separator = new JSeparator();
         separator.setPreferredSize(new Dimension((int)dim.getWidth()-115, 10));
         worker.add(separator, BorderLayout.NORTH);
@@ -255,7 +264,7 @@ public class Main {
         panel.setPreferredSize(new Dimension((int)dim.getWidth()-115, 100));
         panel.setBorder(BorderFactory.createEmptyBorder(0,10,0,0));
         worker.add(panel, BorderLayout.CENTER);
-   }
+    }
 
     public MessageResource getMessageResource() {
         return messageResource;
@@ -280,6 +289,7 @@ public class Main {
     public class HeartBeat implements Runnable{
         private int HR;
         private Message lastMessage;
+        private boolean read = true;
         
         public HeartBeat() {
             HR = 0;
@@ -289,7 +299,7 @@ public class Main {
         }
         @Override
         public void run() {
-            while(true) {
+            while(read) {
                 setHR();
                 if (HR!=0) {
                     int sleep = 1000/HR;
@@ -321,6 +331,7 @@ public class Main {
                     && System.currentTimeMillis()-lastMessage.getTime() > 3000) {
                     HR = (int)(HR *0.8) ;
                     monitor.setHeartRate(HR+"!");
+                    connectButton.setText("Reconnect");
                 } else {
                     lastMessage = message;
                     HR = lastMessage.getHr();
@@ -329,8 +340,14 @@ public class Main {
             }
         }
         
+        public void stopRead() {
+            read = false;
+            HR = 0;
+            
+        }
+        
         public int getHR() {
             return HR;
-        }
+        }        
     }
 }

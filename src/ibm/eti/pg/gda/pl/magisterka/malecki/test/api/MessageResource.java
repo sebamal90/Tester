@@ -29,7 +29,7 @@ public class MessageResource {
         t.start();
     }
     
-    public void stopRead(StreamConnection connection, String messageType) {
+    public void stopRead() {
         messageReader.stopRead();
     }
     

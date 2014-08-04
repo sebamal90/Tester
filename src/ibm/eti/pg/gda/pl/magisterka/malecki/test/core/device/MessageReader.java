@@ -4,8 +4,6 @@
  */
 package ibm.eti.pg.gda.pl.magisterka.malecki.test.core.device;
 
-import ibm.eti.pg.gda.pl.magisterka.malecki.test.core.device.Message;
-import ibm.eti.pg.gda.pl.magisterka.malecki.test.core.device.PolarMessage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Level;
