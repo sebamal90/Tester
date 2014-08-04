@@ -66,7 +66,7 @@ public class Main {
     private Image heart2;
     private JLabel heart;
     private HeartBeat hb;
-    private JPanel monitor;
+    private Monitor monitor;
     private JPanel panel;
     private JPanel worker;
     private Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
@@ -114,11 +114,8 @@ public class Main {
         });
         
         frame.setVisible(true);
-        
-        MonitorUpdater mU = new MonitorUpdater();
-        mU.start();
     }
-    
+        
     public static void setFullScreen(JFrame frame, boolean fullScreen) {
         frame.dispose();
         frame.setResizable(!fullScreen);
@@ -231,10 +228,10 @@ public class Main {
         logger.setEditable(false);
         scrollPane.setViewportView(logger);
         
-        MessageConsole mc = new MessageConsole(logger);
-        mc.redirectOut();
-        mc.redirectErr(Color.RED, null);
-        mc.setMessageLines(100);
+        //MessageConsole mc = new MessageConsole(logger);
+        //mc.redirectOut();
+        //mc.redirectErr(Color.RED, null);
+        //mc.setMessageLines(100);
     
     }
     
@@ -242,66 +239,11 @@ public class Main {
         worker = new JPanel();
         frame.add(worker, BorderLayout.CENTER);
 //        worker.setBackground(Color.GRAY);
-        monitor = new JPanel();
-        monitor.setLayout(new FlowLayout(FlowLayout.LEFT));
-        //monitor.setLayout(new GridLayout(1, 2));
- //       monitor.setBackground(Color.WHITE);
-        //monitor.setPreferredSize(new Dimension(500, 100));
-        monitor.setBorder(BorderFactory.createEmptyBorder(-5,10,0,0));
+        monitor = new Monitor(testResource);
         monitor.setPreferredSize(new Dimension((int)dim.getWidth()-115, 100));
         worker.add(monitor, BorderLayout.NORTH);
-        
-        heartRate = new JLabel("0");
-        heartRate.setHorizontalAlignment(SwingConstants.RIGHT);
-        heartRate.setPreferredSize(new Dimension(150, 100));
-        heartRate.setFont(heartRate.getFont().deriveFont(100.0f));
-        monitor.add(heartRate);
-                
-        Image img = ImageIO.read(getClass().getResource("resources/heart1.png"));
-        heart1 = img.getScaledInstance(80,80, 0);
-        img = ImageIO.read(getClass().getResource("resources/heart2.png"));
-        heart2 = img.getScaledInstance(80,80, 0);
-        heart = new JLabel(new ImageIcon(heart1));
-        heart.setHorizontalAlignment(SwingConstants.CENTER);
-        heart.setPreferredSize(new Dimension(100, 100));
-        monitor.add(heart);
-        
-        JSeparator separator = new JSeparator(SwingConstants.VERTICAL);
-        separator.setPreferredSize(new Dimension(2, 100));
-        monitor.add(separator);
-  
-        powerLabel = new JLabel("0W");
-        powerLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-        powerLabel.setPreferredSize(new Dimension(270, 100));
-        powerLabel.setFont(powerLabel.getFont().deriveFont(100.0f));
-        monitor.add(powerLabel);
-        
-        separator = new JSeparator(SwingConstants.VERTICAL);
-        separator.setPreferredSize(new Dimension(2, 100));
-        monitor.add(separator);
-        
-        timeLabel = new JLabel("0:00");
-        timeLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        timeLabel.setPreferredSize(new Dimension(290, 100));
-        timeLabel.setFont(timeLabel.getFont().deriveFont(100.0f));
-        monitor.add(timeLabel);
-        
-        separator = new JSeparator(SwingConstants.VERTICAL);
-        separator.setPreferredSize(new Dimension(2, 100));
-        monitor.add(separator);
-        
-        SimpleDateFormat ft = new SimpleDateFormat ("HH:mm");
-        clockLabel = new JLabel(ft.format(new Date()));
-        clockLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        clockLabel.setPreferredSize(new Dimension(290, 100));
-        clockLabel.setFont(clockLabel.getFont().deriveFont(100.0f));
-        monitor.add(clockLabel);
-        
-        separator = new JSeparator(SwingConstants.VERTICAL);
-        separator.setPreferredSize(new Dimension(2, 100));
-        monitor.add(separator);
-        
-        separator = new JSeparator();
+               
+        JSeparator separator = new JSeparator();
         separator.setPreferredSize(new Dimension((int)dim.getWidth()-115, 10));
         worker.add(separator, BorderLayout.NORTH);
         
@@ -313,7 +255,7 @@ public class Main {
         panel.setPreferredSize(new Dimension((int)dim.getWidth()-115, 100));
         panel.setBorder(BorderFactory.createEmptyBorder(0,10,0,0));
         worker.add(panel, BorderLayout.CENTER);
-    }
+   }
 
     public MessageResource getMessageResource() {
         return messageResource;
@@ -356,13 +298,13 @@ public class Main {
                         Thread.sleep(40*sleep);
                     } catch (InterruptedException ex) {}
 
-                    heart.setIcon(new ImageIcon(heart2));
+                    monitor.beat(1);
 
                     try {
                         Thread.sleep(20*sleep);
                     } catch (InterruptedException ex) {}
                     
-                    heart.setIcon(new ImageIcon(heart1));
+                    monitor.beat(0);
                 } else {
                     try {
                         Thread.sleep(2000);
@@ -378,11 +320,11 @@ public class Main {
                 if (message.getTime() == lastMessage.getTime() 
                     && System.currentTimeMillis()-lastMessage.getTime() > 3000) {
                     HR = (int)(HR *0.8) ;
-                    heartRate.setText(HR+"!");
+                    monitor.setHeartRate(HR+"!");
                 } else {
                     lastMessage = message;
                     HR = lastMessage.getHr();
-                    heartRate.setText(HR+"");
+                    monitor.setHeartRate(HR+"");
                 }
             }
         }
@@ -390,28 +332,5 @@ public class Main {
         public int getHR() {
             return HR;
         }
-    }
-    
-    private class MonitorUpdater extends Thread {
-        private SimpleDateFormat ft = new SimpleDateFormat ("HH:mm");
-        
-        @Override
-        public void run() {
-            int i=0;
-            while(true) {                   
-                clockLabel.setText(ft.format(new Date()));
-                if (testResource.getTestStatus()) {
-                    timeLabel.setText(testResource.getTimer());
-                }
-                powerLabel.setText(i+"W");
-                i++;
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        }
-        
     }
 }
