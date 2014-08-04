@@ -8,6 +8,7 @@ import ibm.eti.pg.gda.pl.magisterka.malecki.test.api.BTDeviceResource;
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.api.MessageResource;
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.api.TestResource;
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.core.Config;
+import ibm.eti.pg.gda.pl.magisterka.malecki.test.core.MessageConsole;
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.core.device.Message;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -38,6 +39,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextArea;
+import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 
 /**
@@ -50,7 +52,7 @@ public class Main {
     private MessageResource messageResource = new MessageResource(this);
     private BTDeviceResource btdeviceResource = new BTDeviceResource(this);
     private TestResource testResource = new TestResource(this);
-    private JTextArea logger = new javax.swing.JTextArea();
+    private JTextPane logger = new javax.swing.JTextPane();
 
 
     /**
@@ -224,10 +226,15 @@ public class Main {
     private void addLogger() {
         JScrollPane scrollPane = new javax.swing.JScrollPane();
         frame.add(scrollPane, BorderLayout.SOUTH);
-        
-        logger.setRows(5);
+        scrollPane.setPreferredSize(new Dimension((int)dim.getWidth(), 100));
+        //logger.setRows(5);
         logger.setEditable(false);
         scrollPane.setViewportView(logger);
+        
+        MessageConsole mc = new MessageConsole(logger);
+        mc.redirectOut();
+        mc.redirectErr(Color.RED, null);
+        mc.setMessageLines(100);
     
     }
     
@@ -314,14 +321,6 @@ public class Main {
 
     public BTDeviceResource getBtdeviceResource() {
         return btdeviceResource;
-    }
-    
-    public void setLogger(JTextArea logger) {
-        this.logger = logger;
-    }
-
-    public JTextArea getLogger() {
-        return logger;
     }
 
     public void connectionEstabilished() {
