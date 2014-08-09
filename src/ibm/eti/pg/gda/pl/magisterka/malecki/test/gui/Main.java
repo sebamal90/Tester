@@ -270,8 +270,6 @@ public class Main {
         panel = new JPanel();
         panel.setLayout(new FlowLayout(FlowLayout.LEFT));
 //        panel.setBackground(Color.BLUE);
-        JLabel lab = new JLabel("0");
-        //panel.add(lab);
         //panel.setPreferredSize(new Dimension((int)dim.getWidth()-115, 100));
         panel.setBorder(BorderFactory.createEmptyBorder(0,10,0,0));
 //        panel.setBackground(Color.red);

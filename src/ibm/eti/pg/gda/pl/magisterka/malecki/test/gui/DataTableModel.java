@@ -44,6 +44,30 @@ public class DataTableModel extends AbstractTableModel{
         }
     }
     
+    @Override
+    public void setValueAt(Object value, int rowIndex, int columnIndex) {
+        HrData data = datas.get(rowIndex);
+        String oldValue = "";
+        String newValue = "";
+        switch(columnIndex) {
+            case 0: {
+                oldValue = data.getTime()+"";
+                data.setTime((long) value);
+                newValue = data.getTime()+"";
+            }
+            case 1:  {
+                oldValue = data.getHr()+"";
+                data.setHr(Integer.parseInt((String)value));
+                newValue = data.getHr()+"";
+            }
+        }
+        if (!oldValue.equals(newValue)) {
+            System.out.println("In time " + convert(data.getTime()) + " change "
+                    + getColumnName(columnIndex) + " from "  + oldValue + " to " + newValue);
+        }
+        fireTableCellUpdated(rowIndex, columnIndex);
+    }
+    
     private String convert(long time) {
         int sec = (int)(TimeUnit.MILLISECONDS.toSeconds(time) - 
                 TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(time)));

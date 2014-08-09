@@ -121,8 +121,9 @@ public class Monitor extends JPanel{
                 clockLabel.setText(ft.format(new Date()));
                 if (testResource.getTestStatus()) {
                     timeLabel.setText(testResource.getTimer());
+                    powerLabel.setText(i+"W");
                 }
-                powerLabel.setText(i+"W");
+
                 i++;
                 try {
                     Thread.sleep(1000);

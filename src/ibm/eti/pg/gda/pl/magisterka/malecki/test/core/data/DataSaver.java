@@ -8,6 +8,7 @@ import ibm.eti.pg.gda.pl.magisterka.malecki.test.api.MessageResource;
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.core.device.Message;
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.gui.Main;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -36,15 +37,17 @@ public class DataSaver extends Thread {
         startTime = System.currentTimeMillis();
         long lastTime = startTime;
         hrData.add(new HrData(0, main.getHeartBeat().getHR())); 
-                 System.out.println("Saved time:" + hrData.get(hrData.size()-1).getTime()
-                                    + "hr: " + hrData.get(hrData.size()-1).getHr());
+       // hrData.add(new HrData(0, 59)); 
+       //          System.out.println("Saved time:" + hrData.get(hrData.size()-1).getTime()
+       //                             + "hr: " + hrData.get(hrData.size()-1).getHr());
         
         while(work) {
             long now = System.currentTimeMillis();
             if (now-lastTime >= 2000) {
                 hrData.add(new HrData(now-startTime-pauseTime, main.getHeartBeat().getHR())); 
-                System.out.println("Saved time:" + hrData.get(hrData.size()-1).getTime()
-                                   + "hr: " + hrData.get(hrData.size()-1).getHr());
+        //        hrData.add(new HrData(now-startTime-pauseTime, 59)); 
+        //        System.out.println("Saved time:" + hrData.get(hrData.size()-1).getTime()
+        //                           + "hr: " + hrData.get(hrData.size()-1).getHr());
                 lastTime = now;   
             }
              
