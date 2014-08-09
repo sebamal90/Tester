@@ -12,8 +12,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
-import javax.swing.UIManager;
-import javax.swing.plaf.basic.BasicPanelUI;
 import javax.swing.table.TableColumn;
 
 /**
@@ -57,7 +55,7 @@ public class DataTable extends JPanel implements Runnable{
         //scrollPane = new JScrollPane(table);
         table.setPreferredSize(new Dimension(200, frame.getHeight()-325));
         table.setFillsViewportHeight(true);
-        add(table)*/;        
+        add(table);*/        
     }
     
 /*

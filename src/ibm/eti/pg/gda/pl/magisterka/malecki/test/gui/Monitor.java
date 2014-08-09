@@ -5,7 +5,6 @@
 package ibm.eti.pg.gda.pl.magisterka.malecki.test.gui;
 
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.api.TestResource;
-import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Image;

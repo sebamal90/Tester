@@ -6,8 +6,6 @@ package ibm.eti.pg.gda.pl.magisterka.malecki.test.api;
 
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.core.device.BTDevice;
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.gui.Main;
-import java.util.ArrayList;
-import javax.bluetooth.RemoteDevice;
 import javax.microedition.io.StreamConnection;
 
 /**

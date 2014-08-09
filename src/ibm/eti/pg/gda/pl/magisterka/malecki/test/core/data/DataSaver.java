@@ -5,10 +5,8 @@
 package ibm.eti.pg.gda.pl.magisterka.malecki.test.core.data;
 
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.api.MessageResource;
-import ibm.eti.pg.gda.pl.magisterka.malecki.test.core.device.Message;
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.gui.Main;
 import java.util.ArrayList;
-import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

@@ -13,7 +13,7 @@ import javax.swing.table.AbstractTableModel;
  *
  * @author SebaTab
  */
-public class DataTableModel extends AbstractTableModel{
+public class DataTableModel extends AbstractTableModel {
     
     private List<HrData> datas ;
     private String[] columns ; 
@@ -31,7 +31,7 @@ public class DataTableModel extends AbstractTableModel{
 
     @Override
     public int getColumnCount() {
-        return columns.length ;
+        return columns.length;
     }
 
     @Override
