@@ -14,33 +14,35 @@ import javax.microedition.io.StreamConnection;
  * @author SebaTab
  */
 public class MessageResource {
-    
-    private MessageReader messageReader;
-    private final Main main;
 
-    public MessageResource(Main main) {
-        this.main = main;
+    private MessageReader messageReader;
+
+    public MessageResource(Main aMain) {
+        Main main = aMain;
     }
-    
+
     public void startRead(StreamConnection connection, String messageType) {
         messageReader = new MessageReader(connection, messageType);
-        
-        Thread t = new Thread((Runnable)messageReader);
+
+        Thread t = new Thread((Runnable) messageReader);
+        t.setName("Message Reader Thread");
         t.start();
     }
-    
+
     public void stopRead() {
-        messageReader.stopRead();
+        if (messageReader != null) {
+            messageReader.stopRead();
+        }
     }
-    
+
     public Message getLastMessage() {
         return messageReader.getLastMessage();
-    }   
-    
+    }
+
     public int getLastHR() {
         return messageReader.getLastMessage().getHr();
     }
-    
+
     public long getLastTime() {
         return messageReader.getLastMessage().getTime();
     }

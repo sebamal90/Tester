@@ -6,6 +6,7 @@ package ibm.eti.pg.gda.pl.magisterka.malecki.test.core.device;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.bluetooth.BluetoothStateException;
@@ -23,59 +24,69 @@ import javax.microedition.io.StreamConnection;
  * @author SebaTab
  */
 public class BTDevice {
-    private ArrayList<RemoteDevice> devices;
-    private DiscoveryListener listener;
+    private List<RemoteDevice> devices;
     private final Object inquiryCompletedEvent = new Object();
-    private String status="";
-      
-    public ArrayList<RemoteDevice> getDevices() {
-        devices = new ArrayList<RemoteDevice>();  
-        
-        listener = new DiscoveryListener() {
+
+    public List<RemoteDevice> getDevices() {
+        devices = new ArrayList<RemoteDevice>();
+
+        DiscoveryListener listener = new DiscoveryListener() {
             @Override
-            public void deviceDiscovered(RemoteDevice btDevice, DeviceClass cod) {
-                System.out.println("Device " + btDevice.getBluetoothAddress() + " found");
+            public void deviceDiscovered(RemoteDevice btDevice,
+                                         DeviceClass cod) {
+                System.out.println("Device " + btDevice
+                        .getBluetoothAddress() + " found");
                 devices.add(btDevice);
                 try {
-                    System.out.println("     name " + btDevice.getFriendlyName(false));
+                    System.out.println("     name " + btDevice
+                            .getFriendlyName(false));
                 } catch (IOException cantGetDeviceName) {
+                    System.out.println("     device name don't available");
                 }
             }
-            
+
             @Override
             public void inquiryCompleted(int discType) {
                 System.out.println("Device Inquiry completed!");
-                synchronized(inquiryCompletedEvent){
+                synchronized (inquiryCompletedEvent) {
                     inquiryCompletedEvent.notifyAll();
                 }
             }
 
             @Override
             public void serviceSearchCompleted(int transID, int respCode) {
+                //not used
             }
 
             @Override
-            public void servicesDiscovered(int transID, ServiceRecord[] servRecord) {
+            public void servicesDiscovered(int transID,
+                                           ServiceRecord[] servRecord) {
+                //not used
             }
         };
-        
-        synchronized(inquiryCompletedEvent) {
+
+        synchronized (inquiryCompletedEvent) {
             try {
-                boolean started = LocalDevice.getLocalDevice().getDiscoveryAgent().
-                        startInquiry(DiscoveryAgent.GIAC, listener);
+                boolean started = LocalDevice.getLocalDevice()
+                        .getDiscoveryAgent()
+                        .startInquiry(DiscoveryAgent.GIAC, listener);
                 if (started) {
-                    System.out.println("wait for device inquiry to complete...");
+                    System.out.println("wait for device inquiry to complete");
                     inquiryCompletedEvent.wait();
                     System.out.println(devices.size() +  " device(s) found");
                 }
-            } catch (InterruptedException | BluetoothStateException ex) {
-                Logger.getLogger(BTDevice.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (BluetoothStateException ex) {
+                Logger.getLogger(BTDevice.class.getName())
+                        .log(Level.SEVERE, null, ex);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(BTDevice.class.getName())
+                        .log(Level.SEVERE, null, ex);
             }
         }
         return devices;
     }
-    
-    public StreamConnection connectByFriendlyName(String deviceFriendlyName) {
+
+    public StreamConnection connectByName(String deviceName) {
         if (devices == null) {
             getDevices();
         }
@@ -87,28 +98,29 @@ public class BTDevice {
                 name = device.getBluetoothAddress();
             }
 
-            if (name.equals(deviceFriendlyName)) {
-                System.out.println("Trying connect witch " + device.getBluetoothAddress() +"\n");
+            if (name.equals(deviceName)) {
+                System.out.println("Trying connect witch "
+                        + device.getBluetoothAddress() + "\n");
                 return connect(device.getBluetoothAddress());
             }
         }
-        System.out.println("Device " + deviceFriendlyName + " not found");
-        return null;            
+        System.out.println("Device " + deviceName + " not found");
+        return null;
     }
-    
+
     public StreamConnection connect(String deviceAddress) {
         //Polar iWL add: 0022D000F0A7
- 
-        StreamConnection connection;
+
+        StreamConnection connection = null;
         try {
             System.out.println("Started");
-            connection = (StreamConnection) Connector.open("btspp://" +  
-                    deviceAddress + ":1;authenticate=false;encrypt=false;master=true");
-        } catch (Exception e) { 
+            connection = (StreamConnection) Connector
+                    .open("btspp://" + deviceAddress
+                    + ":1;authenticate=false;encrypt=false;master=true");
+        } catch (Exception e) {
             System.out.println("Błąd połączenia z urządzeniem");
-            return null;
+        } finally {
+            return connection;
         }
-        
-        return connection;
     }
 }

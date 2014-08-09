@@ -9,32 +9,27 @@ package ibm.eti.pg.gda.pl.magisterka.malecki.test.core.device;
  * @author SebaTab
  */
 public class Message {
-    
+
     private int hr = -1;
     private long time = -1;
-    
-    public void setHr(int hr) {
-        this.hr = hr;
+
+    public void setHr(int aHr) {
+        this.hr = aHr;
     }
-    
+
     public int getHr() {
         return hr;
     }
-    
-    public void setTime(long time) {
-        this.time = time;
+
+    public void setTime(long aTime) {
+        this.time = aTime;
     }
-    
+
     public long getTime() {
         return time;
     }
-    
+
     public boolean isValid() {
-        if (time != -1 && hr != -1) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        return time != -1 && hr != -1;
     }
 }

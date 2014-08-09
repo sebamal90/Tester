@@ -7,6 +7,7 @@ package ibm.eti.pg.gda.pl.magisterka.malecki.test.api;
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.core.data.DataSaver;
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.gui.Main;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -17,56 +18,59 @@ public class TestResource {
     private final Main main;
     private DataSaver dataSaver;
     private boolean testStatus = false;
-    
-    public TestResource(Main main) {
-        this.main = main;
+
+    public TestResource(Main aMain) {
+        this.main = aMain;
     }
-    
+
     public void startTest() {
         dataSaver = new DataSaver(main);
         testStatus = true;
+        dataSaver.setName("Data Saver Thread");
         dataSaver.start();
     }
-    
+
     public void pauseTest() {
         dataSaver.pauseDataSaver();
         testStatus = false;
     }
-    
+
     public void resumeTest() {
         dataSaver.resumeDataSaver();
         testStatus = true;
     }
-    
+
     public void stopTest() {
-        dataSaver.stopDataSaver();
+        if (dataSaver != null) {
+            dataSaver.stopDataSaver();
+        }
         testStatus = false;
     }
-    
-    public boolean getTestStatus() {
+
+    public boolean isTestStatus() {
         return testStatus;
     }
 
     public String getTimer() {
         long time = dataSaver.getTime();
-        int sec = (int)(TimeUnit.MILLISECONDS.toSeconds(time) - 
-                TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(time)));
+        int sec = (int) (TimeUnit.MILLISECONDS.toSeconds(time)
+                - TimeUnit.MINUTES.toSeconds(
+                  TimeUnit.MILLISECONDS.toMinutes(time)));
         String timer;
-        if (sec<10) {
-            timer = TimeUnit.MILLISECONDS.toMinutes(time) + ":0" + sec; 
+        if (sec < 10) {
+            timer = TimeUnit.MILLISECONDS.toMinutes(time) + ":0" + sec;
         } else {
-            timer = TimeUnit.MILLISECONDS.toMinutes(time) + ":" + sec; 
+            timer = TimeUnit.MILLISECONDS.toMinutes(time) + ":" + sec;
         }
-        
+
         return timer;
     }
-    
-    public ArrayList<DataSaver.HrData> getDatas()  {
+
+    public List<DataSaver.HrData> getDatas()  {
         if (dataSaver == null) {
-            return new ArrayList<>(); 
+            return new ArrayList<DataSaver.HrData>();
+        } else {
+            return dataSaver.getHrData();
         }
-        return dataSaver.getHrData();
     }
-    
-    
 }

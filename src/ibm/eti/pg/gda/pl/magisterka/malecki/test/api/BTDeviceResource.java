@@ -16,69 +16,83 @@ public class BTDeviceResource {
 
     private BTDevice btDevice = new BTDevice();
     private final Main main;
-    
-    public BTDeviceResource(Main main) {
-        this.main = main;
+
+    public BTDeviceResource(Main aMain) {
+        this.main = aMain;
     }
-    
+
     public void getDevices() {
-        GetDevices gd = new GetDevices();
-        gd.start();
+        GetDevices gdev = new GetDevices();
+        gdev.setName("Get Devices Thread");
+        gdev.start();
     }
-    
-    public void connectByFriendlyName(String deviceFriendlyName, String deviceType) {
-        ConnectByFriendlyName cbfn = new ConnectByFriendlyName(deviceFriendlyName, deviceType);
+
+    public void connectByFriendlyName(String deviceName,
+                                      String deviceType) {
+        ConnectByFriendlyName cbfn =
+                new ConnectByFriendlyName(deviceName, deviceType);
+        cbfn.setName("Connection Thread");
         cbfn.start();
     }
-    
+
     public void connect(String deviceAddress, String deviceType) {
         System.out.println("Trying connect with" + deviceAddress);
         Connect connect = new Connect(deviceAddress, deviceType);
+        connect.setName("Connection Thread");
         connect.start();
     }
-    
+
     private class ConnectByFriendlyName extends Thread {
-        private String deviceFriendlyName;
+        private String deviceName;
         private String deviceType;
-        
-        public ConnectByFriendlyName(String deviceFriendlyName, String deviceType) {
-            this.deviceFriendlyName = deviceFriendlyName;
-            this.deviceType = deviceType;
+
+        public ConnectByFriendlyName(String aDeviceName,
+                                     String aDeviceType) {
+            super();
+            this.deviceName = aDeviceName;
+            this.deviceType = aDeviceType;
+
         }
-        
+
         @Override
         public void run() {
-            StreamConnection connection;
-            if ((connection = btDevice.connectByFriendlyName(deviceFriendlyName)) != null) {               
+            StreamConnection connection =
+                    btDevice.connectByName(deviceName);
+            if (connection != null) {
                 main.getMessageResource().startRead(connection, deviceType);
                 main.connectionEstabilished();
-            } 
-        }  
+            }
+        }
     }
-    
+
     private class Connect extends Thread {
         private String deviceAddress;
         private String deviceType;
-        
-        public Connect(String deviceAddress, String deviceType) {
-            this.deviceAddress = deviceAddress;
-            this.deviceType = deviceType;
+
+        public Connect() {
+            super();
         }
-        
+
+        public Connect(String aDeviceAddress, String aDeviceType) {
+            super();
+            this.deviceAddress = aDeviceAddress;
+            this.deviceType = aDeviceType;
+        }
+
         @Override
         public void run() {
-            StreamConnection connection;
-            if ((connection = btDevice.connect(deviceAddress)) != null) {
+            StreamConnection connection = btDevice.connect(deviceAddress);
+            if (connection != null) {
                 main.getMessageResource().startRead(connection, deviceType);
                 main.connectionEstabilished();
-            } 
+            }
         }
     }
-    
+
     private class GetDevices extends Thread {
         @Override
         public void run() {
             btDevice.getDevices();
-        }  
+        }
     }
 }

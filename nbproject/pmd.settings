@@ -1,0 +1,3 @@
+AvoidInstantiatingObjectsInLoops
+BeanMembersShouldSerialize
+LocalVariableCouldBeFinal

@@ -16,33 +16,38 @@ package ibm.eti.pg.gda.pl.magisterka.malecki.test.core.device;
  *      Seq range 0 to 15
  *      Status = Upper nibble may be battery voltage
  *               bit 0 is Beat Detection flag.
- *              
+ *
  *  Additional packet examples;10100010
- *    FE 08 F7 06 F1 48 03 64          
+ *    FE 08 F7 06 F1 48 03 64
  *    FE 0A F5 06 F1 48 03 64 03 70
- *    
+ *
  * @author John R. Gerthoffer
  */
 
-public class PolarMessage extends Message{
+public class PolarMessage extends Message {
     private int len;
     private int chk;
     private int seq;
     private int status;
-    private int i=0;
+    private int i = 0;
 
     public PolarMessage(long time) {
+        super();
         setTime(time);
     }
-         
+
     public boolean setNextValue(int value) {
-        if (i==0) setLen(value);
-        else if (i==1) setChk(value);
-        else if (i==2) setSeq(value);
-        else if (i==3) setStatus(value >> 4);
-        else if (i==4) {
+        if (i == 0) {
+            setLen(value);
+        } else if (i == 1) {
+            setChk(value);
+        } else if (i == 2) {
+            setSeq(value);
+        } else if (i == 3) {
+            setStatus(value >> 4);
+        } else if (i == 4) {
             i++;
-            setHr(value);      
+            setHr(value);
             if (!isValid()) {
                 System.out.println("Nieprawidłowa wiadomość");
                 return false;
@@ -52,30 +57,26 @@ public class PolarMessage extends Message{
         i++;
         return false;
     }
-    
-    public void setLen(int len) {
-        this.len = len;
+
+    public void setLen(int aLen) {
+        this.len = aLen;
     }
 
-    public void setChk(int chk) {
-        this.chk = chk;
+    public void setChk(int aChk) {
+        this.chk = aChk;
     }
 
-    public void setSeq(int seq) {
-        this.seq = seq;
+    public void setSeq(int aSeq) {
+        this.seq = aSeq;
     }
 
-    public void setStatus(int status) {
-        this.status = status;
+    public void setStatus(int aStatus) {
+        this.status = aStatus;
     }
-    
+
     @Override
     public boolean isValid() {
-        if (len+chk == 255)
-            return true;
-        else
-            return false;
-        
+        return len + chk == 255;
     }
 
     public int getLen() {
@@ -92,5 +93,5 @@ public class PolarMessage extends Message{
 
     public int getStatus() {
         return status;
-    }    
+    }
 }
