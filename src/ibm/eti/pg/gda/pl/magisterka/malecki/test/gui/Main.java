@@ -48,23 +48,11 @@ import javax.swing.SwingConstants;
  */
 public class Main {
 
-    private static JFrame frame;
+    public static JFrame frame;
     private MessageResource messageResource = new MessageResource(this);
     private BTDeviceResource btdeviceResource = new BTDeviceResource(this);
     private TestResource testResource = new TestResource(this);
     private JTextPane logger = new javax.swing.JTextPane();
-
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) throws IOException {
-        new Main();
-    }
-    private JLabel heartRate;
-    private Image heart1;
-    private Image heart2;
-    private JLabel heart;
     private HeartBeat hb;
     private Monitor monitor;
     private JPanel panel;
@@ -73,15 +61,21 @@ public class Main {
     private JSeparator menuSeparator;
     private JPanel menu;
     private JPanel menu2;
-    private JLabel clockLabel;
-    private long time;
-    private JLabel powerLabel;
-    private JLabel timeLabel;
     private boolean connectionEstabilished;
     private JButton startStopButton;
     private JButton pauseResumeButton;
     private JButton connectButton;
-    
+    private JButton deviceButton;
+    private JScrollPane scrollPane;    
+    private DataTable dT;
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) throws IOException {
+        new Main();
+    }
+
     public Main() throws IOException {
         frame = new JFrame("Test");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -110,7 +104,12 @@ public class Main {
                 menuSeparator.setPreferredSize(new Dimension(2, menu.getHeight()));
                 
                 monitor.setPreferredSize(new Dimension(frame.getWidth()-115, 100));
-                panel.setPreferredSize(new Dimension(frame.getWidth()-115, 100));
+                scrollPane.setPreferredSize(new Dimension(frame.getWidth()-130, frame.getHeight()-300));
+                
+                if (dT != null) {
+                    //dT.updateUI();
+                }
+                
             }          
         });
         
@@ -178,10 +177,15 @@ public class Main {
                     pauseResumeButton.setText("Pause");
                 }
                 else if (action.equals("Stats")) {
-                    btdeviceResource.getDevices();
+                    panel.removeAll();
+                    dT = new DataTable(testResource, frame);
+                    Thread t = new Thread((Runnable)dT);
+                    t.start();
+                    panel.add(dT);
                 } else if (action.equals("Connect")) {
                     btdeviceResource.connect(Config.deviceAddress, Config.deviceType);
-                    connectButton.setText("Disconnect");
+                    connectButton.setText("Reconnect");
+                    deviceButton.setText("Disconnect");
                 } else if (action.equals("Disconnect")) {
                     messageResource.stopRead();
                     connectButton.setText("Connect");
@@ -189,6 +193,8 @@ public class Main {
                 } else if (action.equals("Reconnect")) {
                     messageResource.stopRead();
                     btdeviceResource.connect(Config.deviceAddress, Config.deviceType);
+                } else if (action.equals("Devices")) {
+                    btdeviceResource.getDevices();
                 } 
             }
         };
@@ -218,6 +224,11 @@ public class Main {
         connectButton.setPreferredSize(new Dimension(menuSize, menuSize));
         connectButton.addActionListener(menuListener);
         menu2.add(connectButton);
+        
+        deviceButton = new JButton("Devices");
+        deviceButton.setPreferredSize(new Dimension(menuSize, menuSize/2));
+        deviceButton.addActionListener(menuListener);
+        menu2.add(deviceButton);
        
         menu.add(menu2);
 
@@ -260,10 +271,14 @@ public class Main {
         panel.setLayout(new FlowLayout(FlowLayout.LEFT));
 //        panel.setBackground(Color.BLUE);
         JLabel lab = new JLabel("0");
-        panel.add(lab);
-        panel.setPreferredSize(new Dimension((int)dim.getWidth()-115, 100));
+        //panel.add(lab);
+        //panel.setPreferredSize(new Dimension((int)dim.getWidth()-115, 100));
         panel.setBorder(BorderFactory.createEmptyBorder(0,10,0,0));
-        worker.add(panel, BorderLayout.CENTER);
+//        panel.setBackground(Color.red);
+        scrollPane = new JScrollPane(panel);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        scrollPane.getVerticalScrollBar().setUnitIncrement(20);
+        worker.add(scrollPane, BorderLayout.CENTER);
     }
 
     public MessageResource getMessageResource() {

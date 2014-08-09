@@ -34,6 +34,7 @@ public class BTDeviceResource {
     }
     
     public void connect(String deviceAddress, String deviceType) {
+        System.out.println("Trying connect with" + deviceAddress);
         Connect connect = new Connect(deviceAddress, deviceType);
         connect.start();
     }

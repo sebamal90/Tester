@@ -6,6 +6,7 @@ package ibm.eti.pg.gda.pl.magisterka.malecki.test.api;
 
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.core.data.DataSaver;
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.gui.Main;
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -58,6 +59,13 @@ public class TestResource {
         }
         
         return timer;
+    }
+    
+    public ArrayList<DataSaver.HrData> getDatas()  {
+        if (dataSaver == null) {
+            return new ArrayList<>(); 
+        }
+        return dataSaver.getHrData();
     }
     
     
