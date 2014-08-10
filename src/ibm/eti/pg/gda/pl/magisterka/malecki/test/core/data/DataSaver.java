@@ -4,7 +4,6 @@
  */
 package ibm.eti.pg.gda.pl.magisterka.malecki.test.core.data;
 
-import ibm.eti.pg.gda.pl.magisterka.malecki.test.api.MessageResource;
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.gui.Main;
 import java.util.ArrayList;
 import java.util.List;

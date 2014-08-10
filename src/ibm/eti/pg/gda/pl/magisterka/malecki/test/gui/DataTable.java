@@ -8,7 +8,6 @@ import ibm.eti.pg.gda.pl.magisterka.malecki.test.api.TestResource;
 import java.awt.BorderLayout;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;

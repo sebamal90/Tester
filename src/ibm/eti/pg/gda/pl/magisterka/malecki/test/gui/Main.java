@@ -7,7 +7,6 @@ package ibm.eti.pg.gda.pl.magisterka.malecki.test.gui;
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.api.BTDeviceResource;
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.api.MessageResource;
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.api.TestResource;
-import ibm.eti.pg.gda.pl.magisterka.malecki.test.core.Config;
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.core.MessageConsole;
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.core.device.Message;
 import java.awt.BorderLayout;
@@ -23,7 +22,6 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -32,7 +30,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextPane;
-import javax.swing.SwingConstants;
 
 /**
  *

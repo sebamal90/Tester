@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package ibm.eti.pg.gda.pl.magisterka.malecki.test.gui;
 
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.api.BTDeviceResource;
@@ -29,7 +24,7 @@ public class Menu extends JPanel {
     private JButton connectButton;
     private JButton deviceButton;
     private JSeparator menuSeparator;
-    private JPanel menu;
+    private JPanel menuPanel;
     private final Main main;
     private DataTable dT;
 
@@ -89,39 +84,39 @@ public class Menu extends JPanel {
             }
         };
 
-        menu = new JPanel();
+        menuPanel = new JPanel();
 //        menu2.setBackground(Color.red);
-        menu.setPreferredSize(new Dimension(menuSize, 450));
+        menuPanel.setPreferredSize(new Dimension(menuSize, 450));
 
         startStopButton = new JButton("Start");
         startStopButton.setPreferredSize(new Dimension(menuSize, menuSize));
         startStopButton.addActionListener(menuListener);
-        menu.add(startStopButton);
+        menuPanel.add(startStopButton);
 
         pauseResumeButton = new JButton("Pause");
         pauseResumeButton.setPreferredSize(
                 new Dimension(menuSize, menuSize / 2));
         pauseResumeButton.addActionListener(menuListener);
         pauseResumeButton.setEnabled(false);
-        menu.add(pauseResumeButton);
+        menuPanel.add(pauseResumeButton);
 
         JButton statsButton = new JButton("Stats");
         statsButton.setPreferredSize(new Dimension(menuSize, menuSize));
         //statsButton.setEnabled(false);
         statsButton.addActionListener(menuListener);
-        menu.add(statsButton);
+        menuPanel.add(statsButton);
 
         connectButton = new JButton("Connect");
         connectButton.setPreferredSize(new Dimension(menuSize, menuSize));
         connectButton.addActionListener(menuListener);
-        menu.add(connectButton);
+        menuPanel.add(connectButton);
 
         deviceButton = new JButton("Devices");
         deviceButton.setPreferredSize(new Dimension(menuSize, menuSize / 2));
         deviceButton.addActionListener(menuListener);
-        menu.add(deviceButton);
+        menuPanel.add(deviceButton);
 
-        add(menu);
+        add(menuPanel);
 
         menuSeparator = new JSeparator(SwingConstants.VERTICAL);
         menuSeparator.setPreferredSize(new Dimension(2, 450));
@@ -131,12 +126,12 @@ public class Menu extends JPanel {
 
     @Override
     public void updateUI() {
-        setUI((BasicPanelUI)UIManager.getUI(this));
-        if (menu != null) {
-            menu.setPreferredSize(new Dimension(100, this.getHeight()));
+        setUI((BasicPanelUI) UIManager.getUI(this));
+        if (menuPanel != null) {
+            menuPanel.setPreferredSize(new Dimension(100, this.getHeight()));
             menuSeparator.setPreferredSize(
                     new Dimension(2, this.getHeight()));
-            menu.setSize(new Dimension(100, this.getHeight()));
+            menuPanel.setSize(new Dimension(100, this.getHeight()));
             menuSeparator.setPreferredSize(
                     new Dimension(2, this.getHeight()));
         }
@@ -146,3 +141,4 @@ public class Menu extends JPanel {
         return dT;
     }
 }
+

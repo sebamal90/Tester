@@ -3,6 +3,7 @@ package ibm.eti.pg.gda.pl.magisterka.malecki.test.gui;
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.core.Config;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.swing.BorderFactory;
@@ -15,6 +16,7 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.event.ChartChangeEvent;
 import org.jfree.chart.event.ChartChangeListener;
@@ -23,8 +25,12 @@ import org.jfree.chart.event.ChartProgressListener;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.chart.util.RelativeDateFormat;
+import org.jfree.data.time.Day;
+import org.jfree.data.time.Hour;
 import org.jfree.data.time.Minute;
 import org.jfree.data.time.RegularTimePeriod;
+import org.jfree.data.time.Second;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.time.TimeSeriesDataItem;
@@ -88,28 +94,31 @@ public class Graph extends ApplicationFrame {
     private static class MyDemoPanel extends GraphPanel
         implements ChartChangeListener, ChartProgressListener {
 
-        private static final int SERIES_COUNT = 4;
+        private static final int SERIES_COUNT = 1;
         private TimeSeriesCollection[] datasets;
         private TimeSeries[] series;
         private ChartPanel chartPanel;
         private DemoTableModel model;
 
-        private XYDataset createDataset(int i, String s, double d,
+        private XYDataset createDataset(int nrSerii, String nazwaSerii, double d,
                                   RegularTimePeriod regulartimeperiod, int j) {
-            series[i] = new TimeSeries(s);
+            series[nrSerii] = new TimeSeries(nazwaSerii);
             RegularTimePeriod regulartimeperiod1 = regulartimeperiod;
+            long time = 0;
             double d1 = d;
+
             for (int k = 0; k < j; k++) {
-                series[i].add(regulartimeperiod1, d1);
+                series[nrSerii].add(regulartimeperiod1, d1);
                 regulartimeperiod1 = regulartimeperiod1.next();
                 d1 *= 1.0D + (Math.random() - 0.495D) / 10D;
             }
 
-            datasets[i] = new TimeSeriesCollection();
-            datasets[i].addSeries(series[i]);
-            return datasets[i];
+            datasets[nrSerii] = new TimeSeriesCollection();
+            datasets[nrSerii].addSeries(series[nrSerii]);
+            return datasets[nrSerii];
         }
 
+        @Override
         public void chartChanged(ChartChangeEvent chartchangeevent) {
             if (chartPanel != null) {
                 JFreeChart jfreechart = chartPanel.getChart();
@@ -120,7 +129,7 @@ public class Graph extends ApplicationFrame {
                     double d = xyplot.getDomainCrosshairValue();
                     model.setValueAt(comparable, 0, 0);
                     long l = (long) d;
-                    for (int i = 0; i < 4; i++) {
+                    for (int i = 0; i < 1; i++) {
                         model.setValueAt(Long.valueOf(l), i, 1);
                         int[] ai = datasets[i].getSurroundingItems(0, l);
                         long l1 = 0L;
@@ -178,13 +187,17 @@ public class Graph extends ApplicationFrame {
 
         private JFreeChart createChart() {
             JFreeChart jfreechart = ChartFactory.createTimeSeriesChart(
-                        "Crosshair Demo 2", "Time of Day", "Value",
-                        null, true, true, false);
+                        "Progressive test", "Time", "Hr",
+                        null, true, false, false);
             XYPlot xyplot = (XYPlot) jfreechart.getPlot();
-            XYDataset[] axydataset = new XYDataset[4];
-            for (int i = 0; i < 4; i++) {
+            XYDataset[] axydataset = new XYDataset[1];
+            Hour hour = new Hour(0, new Day());
+            Minute minute = new Minute(0, hour);
+            Second sec = new Second(0, minute);
+
+            for (int i = 0; i < 1; i++) {
                 axydataset[i] = createDataset(i, "Series " + i, 100D
-                        + (double) i * 200D, new Minute(), 200);
+                        + (double) i * 200D, sec, 200);
                 if (i == 0) {
                     xyplot.setDataset(axydataset[i]);
                 } else {
@@ -202,11 +215,17 @@ public class Graph extends ApplicationFrame {
             xyplot.setDomainCrosshairVisible(true);
             xyplot.setDomainCrosshairLockedOnData(false);
             xyplot.setRangeCrosshairVisible(false);
+
+            DateAxis dateaxis = (DateAxis)xyplot.getDomainAxis();
+            RelativeDateFormat relativedateformat = new RelativeDateFormat(sec.getFirstMillisecond());
+            relativedateformat.setSecondFormatter(new DecimalFormat("00"));
+            dateaxis.setDateFormatOverride(relativedateformat);
             ChartUtilities.applyCurrentTheme(jfreechart);
 
             return jfreechart;
         }
 
+        @Override
         public void chartProgress(ChartProgressEvent chartprogressevent) {
             if (chartprogressevent.getType() != 2) {
                 return;
@@ -221,8 +240,8 @@ public class Graph extends ApplicationFrame {
                     model.setValueAt(comparable, 0, 0);
                     long l = (long) d;
                     model.setValueAt(Long.valueOf(l), 0, 1);
-                    for (int i = 0; i < 4; i++) {
-                        int j = series[i].getIndex(new Minute(new Date(l)));
+                    for (int i = 0; i < 1; i++) {
+                        int j = series[i].getIndex(new Second(new Date(l)));
                         if (j >= 0) {
                             TimeSeriesDataItem timeseriesdataitem =
                                     series[i].getDataItem(
@@ -257,8 +276,8 @@ public class Graph extends ApplicationFrame {
 
         public MyDemoPanel() {
             super(new BorderLayout());
-            datasets = new TimeSeriesCollection[4];
-            series = new TimeSeries[4];
+            datasets = new TimeSeriesCollection[1];
+            series = new TimeSeries[1];
             JPanel jpanel = new JPanel(new BorderLayout());
             JFreeChart jfreechart = createChart();
             addChart(jfreechart);
@@ -275,8 +294,8 @@ public class Graph extends ApplicationFrame {
             JPanel jpanel1 = new JPanel(new BorderLayout());
             jpanel1.setPreferredSize(new Dimension(400, 120));
             jpanel1.setBorder(BorderFactory.createEmptyBorder(0, 4, 4, 4));
-            model = new DemoTableModel(4);
-            for (int i = 0; i < 4; i++) {
+            model = new DemoTableModel(1);
+            for (int i = 0; i < 1; i++) {
                 XYPlot xyplot = (XYPlot) jfreechart.getPlot();
                 model.setValueAt(xyplot.getDataset(i).getSeriesKey(0), i, 0);
                 model.setValueAt(new Double("0.00"), i, 1);
