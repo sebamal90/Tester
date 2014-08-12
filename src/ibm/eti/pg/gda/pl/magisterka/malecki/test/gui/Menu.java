@@ -27,6 +27,8 @@ public class Menu extends JPanel {
     private JPanel menuPanel;
     private final Main main;
     private DataTable dT;
+    private Graph graph;
+    private final JButton statsGraphButton;
 
     public Menu(Main aMain, final TestResource testResource,
                 final BTDeviceResource bTDeviceResource,
@@ -64,7 +66,20 @@ public class Menu extends JPanel {
                         t.setName("DataTable Thread");
                         t.start();
                     }
+                    statsGraphButton.setText("Graph");
                     main.getPanel().add(dT);
+                    main.getPanel().updateUI();
+                } else if (action.equals("Graph")) {
+                    main.getPanel().removeAll();
+                    if (graph == null) {
+                        graph = new Graph();
+                        Thread t = new Thread((Runnable) graph);
+                        t.setName("Graph Thread");
+                        t.start();
+                    }
+                    statsGraphButton.setText("Stats");
+                    main.getPanel().add(graph);
+                    main.getPanel().updateUI();
                 } else if (action.equals("Connect")) {
                     bTDeviceResource.connect(Config.DEVICE_ADDRESS,
                                              Config.DEVICE_TYPE);
@@ -100,11 +115,11 @@ public class Menu extends JPanel {
         pauseResumeButton.setEnabled(false);
         menuPanel.add(pauseResumeButton);
 
-        JButton statsButton = new JButton("Stats");
-        statsButton.setPreferredSize(new Dimension(menuSize, menuSize));
+        statsGraphButton = new JButton("Stats");
+        statsGraphButton.setPreferredSize(new Dimension(menuSize, menuSize));
         //statsButton.setEnabled(false);
-        statsButton.addActionListener(menuListener);
-        menuPanel.add(statsButton);
+        statsGraphButton.addActionListener(menuListener);
+        menuPanel.add(statsGraphButton);
 
         connectButton = new JButton("Connect");
         connectButton.setPreferredSize(new Dimension(menuSize, menuSize));

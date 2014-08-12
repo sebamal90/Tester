@@ -41,11 +41,11 @@ public class Monitor extends JPanel {
         super();
         this.testResource = aTestResource;
         setLayout(new FlowLayout(FlowLayout.LEFT));
-        setBorder(BorderFactory.createEmptyBorder(-5, 10, 0, 0));
+        setBorder(BorderFactory.createEmptyBorder(-5, 5, 0, 0));
 
         heartRate = new JLabel("0");
         heartRate.setHorizontalAlignment(SwingConstants.RIGHT);
-        heartRate.setPreferredSize(new Dimension(150, 100));
+        heartRate.setPreferredSize(new Dimension(170, 100));
         heartRate.setFont(heartRate.getFont().deriveFont(100.0f));
         add(heartRate);
         Image img;
@@ -74,7 +74,7 @@ public class Monitor extends JPanel {
 
         timeLabel = new JLabel("0:00");
         timeLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        timeLabel.setPreferredSize(new Dimension(290, 100));
+        timeLabel.setPreferredSize(new Dimension(285, 100));
         timeLabel.setFont(timeLabel.getFont().deriveFont(100.0f));
         add(timeLabel);
 
@@ -85,7 +85,7 @@ public class Monitor extends JPanel {
         SimpleDateFormat ft = new SimpleDateFormat("HH:mm", Config.LOCALE);
         clockLabel = new JLabel(ft.format(new Date()));
         clockLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        clockLabel.setPreferredSize(new Dimension(290, 100));
+        clockLabel.setPreferredSize(new Dimension(285, 100));
         clockLabel.setFont(clockLabel.getFont().deriveFont(100.0f));
         add(clockLabel);
 

@@ -1,17 +1,25 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
 package ibm.eti.pg.gda.pl.magisterka.malecki.test.gui;
 
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.core.Config;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableModel;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.ChartUtilities;
@@ -35,313 +43,294 @@ import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.time.TimeSeriesDataItem;
 import org.jfree.data.xy.XYDataset;
-import org.jfree.ui.ApplicationFrame;
 import org.jfree.ui.DateCellRenderer;
 import org.jfree.ui.NumberCellRenderer;
-import org.jfree.ui.RefineryUtilities;
 
-public class Graph extends ApplicationFrame {
-    static class DemoTableModel extends AbstractTableModel
-                                implements TableModel {
+/**
+ *
+ * @author SebaTab
+ */
+public class Graph extends JPanel
+    implements ChartChangeListener, ChartProgressListener, Runnable {
 
-        private Object[][] data;
+    private static final int SERIES_COUNT = 3;
+    private TimeSeriesCollection[] datasets;
+    private TimeSeries[] series;
+    private ChartPanel chartPanel;
+    private GraphTableModel model;
+    private List charts;
 
-        public int getColumnCount() {
-            return 7;
+    public void addChart(JFreeChart jfreechart) {
+        charts.add(jfreechart);
+    }
+
+    public JFreeChart[] getCharts() {
+        int i = charts.size();
+        JFreeChart[] ajfreechart = new JFreeChart[i];
+        for (int j = 0; j < i; j++) {
+            ajfreechart[j] = (JFreeChart) charts.get(j);
         }
 
-        public int getRowCount() {
-            return data.length;
+        return ajfreechart;
+    }
+
+    private XYDataset createDataset(int nrSerii, String nazwaSerii, double d,
+                              RegularTimePeriod regulartimeperiod, int j) {
+        series[nrSerii] = new TimeSeries(nazwaSerii);
+        RegularTimePeriod regulartimeperiod1 = regulartimeperiod;
+        long time = 0;
+        double d1 = d;
+
+        for (int k = 0; k < j; k++) {
+            series[nrSerii].add(regulartimeperiod1, d1);
+            regulartimeperiod1 = regulartimeperiod1.next();
+            d1 *= 1.0D + (Math.random() - 0.495D) / 10D;
         }
 
-        public Object getValueAt(int i, int j) {
-            return data[i][j];
-        }
+        datasets[nrSerii] = new TimeSeriesCollection();
+        datasets[nrSerii].addSeries(series[nrSerii]);
+        return datasets[nrSerii];
+    }
 
-        public void setValueAt(Object obj, int i, int j) {
-            data[i][j] = obj;
-            fireTableDataChanged();
-        }
-
-        public String getColumnName(int i) {
-            switch (i) {
-            case 0: // '\0'
-                return "Series Name:";
-            case 1: // '\001'
-                return "X:";
-            case 2: // '\002'
-                return "Y:";
-            case 3: // '\003'
-                return "X (prev)";
-            case 4: // '\004'
-                return "Y (prev):";
-            case 5: // '\005'
-                return "X (next):";
-            case 6: // '\006'
-                return "Y (next):";
-            default:
-                break;
+    @Override
+    public void chartChanged(ChartChangeEvent chartchangeevent) {
+        if (chartPanel != null) {
+            JFreeChart jfreechart = chartPanel.getChart();
+            if (jfreechart != null) {
+                XYPlot xyplot = (XYPlot) jfreechart.getPlot();
+                XYDataset xydataset = xyplot.getDataset();
+                Comparable comparable = xydataset.getSeriesKey(0);
+                double d = xyplot.getDomainCrosshairValue();
+                model.setValueAt(comparable, 0, 0);
+                long l = (long) d;
+                for (int i = 0; i < SERIES_COUNT; i++) {
+                    model.setValueAt(Long.valueOf(l), i, 1);
+                    int[] ai = datasets[i].getSurroundingItems(0, l);
+                    long l1 = 0L;
+                    long l2 = 0L;
+                    double d1 = 0.0D;
+                    double d2 = 0.0D;
+                    if (ai[0] >= 0) {
+                        TimeSeriesDataItem timeseriesdataitem =
+                                series[i].getDataItem(ai[0]);
+                        l1 = timeseriesdataitem.getPeriod()
+                                .getMiddleMillisecond();
+                        Number number = timeseriesdataitem.getValue();
+                        if (number != null) {
+                            d1 = number.doubleValue();
+                            model.setValueAt(new Double(d1), i, 4);
+                        } else {
+                            model.setValueAt(null, i, 4);
+                        }
+                        model.setValueAt(Long.valueOf(l1), i, 3);
+                    } else {
+                        model.setValueAt(new Double(0.0D), i, 4);
+                        model.setValueAt(new Double(xyplot.getDomainAxis()
+                                .getRange().getLowerBound()), i, 3);
+                    }
+                    if (ai[1] >= 0) {
+                        TimeSeriesDataItem timeseriesdataitem1 =
+                                series[i].getDataItem(ai[1]);
+                        l2 = timeseriesdataitem1.getPeriod()
+                                .getMiddleMillisecond();
+                        Number number1 = timeseriesdataitem1.getValue();
+                        if (number1 != null) {
+                            d2 = number1.doubleValue();
+                            model.setValueAt(new Double(d2), i, 6);
+                        } else {
+                            model.setValueAt(null, i, 6);
+                        }
+                        model.setValueAt(Long.valueOf(l2), i, 5);
+                    } else {
+                        model.setValueAt(new Double(0.0D), i, 6);
+                        model.setValueAt(new Double(xyplot.getDomainAxis()
+                                .getRange().getUpperBound()), i, 5);
+                    }
+                    double d3 = 0.0D;
+                    if (l2 - l1 > 0L) {
+                        d3 = d1 + (((double) l - (double) l1)
+                                / ((double) l2 - (double) l1)) * (d2 - d1);
+                    } else {
+                        d3 = d1;
+                    }
+                    model.setValueAt(new Double(d3), i, 2);
+                }
             }
-            return null;
-        }
-
-        public DemoTableModel(int i) {
-            super();
-            data = new Object[i][7];
         }
     }
 
-    private static class MyDemoPanel extends GraphPanel
-        implements ChartChangeListener, ChartProgressListener {
+    private JFreeChart createChart() {
+        JFreeChart jfreechart = ChartFactory.createTimeSeriesChart(
+                    "Progressive test", "Time", "Hr",
+                    null, true, false, false);
+        XYPlot xyplot = (XYPlot) jfreechart.getPlot();
+        XYDataset[] axydataset = new XYDataset[SERIES_COUNT];
+        Hour hour = new Hour(0, new Day());
+        Minute minute = new Minute(0, hour);
+        Second sec = new Second(0, minute);
+        String[] seriesName = {"Hr", "Power", "Lactate"};
+        for (int i = 0; i < SERIES_COUNT; i++) {
+            axydataset[i] = createDataset(i, seriesName[i], 100D
+                    + (double) i * 200D, sec, 59);
+            if (i == 0) {
+                xyplot.setDataset(axydataset[i]);
+            } else {
+                xyplot.setDataset(i, axydataset[i]);
+                if (i < 3) xyplot.setRangeAxis(i, new NumberAxis(seriesName[i]));
+                else xyplot.setRangeAxis(i, new NumberAxis("Axis " + (i + 1)));
+                xyplot.mapDatasetToRangeAxis(i, i);
+                xyplot.setRenderer(i,
+                                  new XYLineAndShapeRenderer(true, false));
+            }
+        }
 
-        private static final int SERIES_COUNT = 1;
-        private TimeSeriesCollection[] datasets;
-        private TimeSeries[] series;
-        private ChartPanel chartPanel;
-        private DemoTableModel model;
+        jfreechart.addChangeListener(this);
+        jfreechart.addProgressListener(this);
+        xyplot.setOrientation(PlotOrientation.VERTICAL);
+        xyplot.setDomainCrosshairVisible(true);
+        xyplot.setDomainCrosshairLockedOnData(false);
+        xyplot.setRangeCrosshairVisible(false);
 
-        private XYDataset createDataset(int nrSerii, String nazwaSerii, double d,
-                                  RegularTimePeriod regulartimeperiod, int j) {
-            series[nrSerii] = new TimeSeries(nazwaSerii);
-            RegularTimePeriod regulartimeperiod1 = regulartimeperiod;
-            long time = 0;
-            double d1 = d;
+        DateAxis dateaxis = (DateAxis)xyplot.getDomainAxis();
+        RelativeDateFormat relativedateformat = new RelativeDateFormat(sec.getFirstMillisecond());
+        relativedateformat.setSecondFormatter(new DecimalFormat("00"));
+        dateaxis.setDateFormatOverride(relativedateformat);
+        ChartUtilities.applyCurrentTheme(jfreechart);
 
-            for (int k = 0; k < j; k++) {
-                series[nrSerii].add(regulartimeperiod1, d1);
-                regulartimeperiod1 = regulartimeperiod1.next();
+        return jfreechart;
+    }
+
+    @Override
+    public void chartProgress(ChartProgressEvent chartprogressevent) {
+        if (chartprogressevent.getType() != 2) {
+            return;
+        }
+        if (chartPanel != null) {
+            JFreeChart jfreechart = chartPanel.getChart();
+            if (jfreechart != null) {
+                XYPlot xyplot = (XYPlot) jfreechart.getPlot();
+                XYDataset xydataset = xyplot.getDataset();
+                Comparable comparable = xydataset.getSeriesKey(0);
+                double d = xyplot.getDomainCrosshairValue();
+                model.setValueAt(comparable, 0, 0);
+                long l = (long) d;
+                model.setValueAt(Long.valueOf(l), 0, 1);
+                for (int i = 0; i < SERIES_COUNT; i++) {
+                    int j = series[i].getIndex(new Second(new Date(l)));
+                    if (j >= 0) {
+                        TimeSeriesDataItem timeseriesdataitem =
+                                series[i].getDataItem(
+                                Math.min(199, Math.max(0, j)));
+                        TimeSeriesDataItem timeseriesdataitem1 =
+                                series[i].getDataItem(Math.max(0, j - 1));
+                        TimeSeriesDataItem timeseriesdataitem2 =
+                                series[i].getDataItem(Math.min(199, j + 1));
+                        long l1 = timeseriesdataitem.getPeriod()
+                                .getMiddleMillisecond();
+                        double d1 = timeseriesdataitem.getValue()
+                                .doubleValue();
+                        long l2 = timeseriesdataitem1.getPeriod()
+                                .getMiddleMillisecond();
+                        double d2 = timeseriesdataitem1.getValue()
+                                .doubleValue();
+                        long l3 = timeseriesdataitem2.getPeriod()
+                                .getMiddleMillisecond();
+                        double d3 = timeseriesdataitem2.getValue()
+                                .doubleValue();
+                        model.setValueAt(Long.valueOf(l1), i, 1);
+                        model.setValueAt(new Double(d1), i, 2);
+                        model.setValueAt(Long.valueOf(l2), i, 3);
+                        model.setValueAt(new Double(d2), i, 4);
+                        model.setValueAt(Long.valueOf(l3), i, 5);
+                        model.setValueAt(new Double(d3), i, 6);
+                    }
+                }
+            }
+        }
+    }
+
+    public Graph() {
+        super(new BorderLayout());
+        charts = new ArrayList();
+        datasets = new TimeSeriesCollection[SERIES_COUNT];
+        series = new TimeSeries[SERIES_COUNT];
+        setPreferredSize(new Dimension(800, 400));
+        JPanel jpanel = new JPanel(new BorderLayout());
+        setBackground(Color.red);
+        jpanel.setBackground(Color.red);
+        JFreeChart jfreechart = createChart();
+        addChart(jfreechart);
+        chartPanel = new ChartPanel(jfreechart);
+        chartPanel.setPreferredSize(new Dimension(600, 270));
+        chartPanel.setDomainZoomable(true);
+        chartPanel.setRangeZoomable(true);
+        javax.swing.border.CompoundBorder compoundborder =
+                BorderFactory.createCompoundBorder(
+                BorderFactory.createEmptyBorder(4, 4, 4, 4),
+                BorderFactory.createEtchedBorder());
+        chartPanel.setBorder(compoundborder);
+        jpanel.add(chartPanel);
+        JPanel jpanel1 = new JPanel(new BorderLayout());
+        jpanel1.setPreferredSize(new Dimension(400, 75));
+        jpanel1.setBorder(BorderFactory.createEmptyBorder(0, 4, 4, 4));
+        model = new GraphTableModel(SERIES_COUNT);
+        for (int i = 0; i < SERIES_COUNT; i++) {
+            XYPlot xyplot = (XYPlot) jfreechart.getPlot();
+            model.setValueAt(xyplot.getDataset(i).getSeriesKey(0), i, 0);
+            model.setValueAt(new Double("0.00"), i, 1);
+            model.setValueAt(new Double("0.00"), i, 2);
+            model.setValueAt(new Double("0.00"), i, 3);
+            model.setValueAt(new Double("0.00"), i, 4);
+            model.setValueAt(new Double("0.00"), i, 5);
+            model.setValueAt(new Double("0.00"), i, 6);
+        }
+
+        JTable jtable = new JTable(model);
+        DateCellRenderer datecellrenderer =
+                new DateCellRenderer(
+                    new SimpleDateFormat("HH:mm:ss", Config.LOCALE));
+        NumberCellRenderer numbercellrenderer = new NumberCellRenderer();
+        jtable.getColumnModel().getColumn(1)
+                .setCellRenderer(datecellrenderer);
+        jtable.getColumnModel().getColumn(2)
+                .setCellRenderer(numbercellrenderer);
+        jtable.getColumnModel().getColumn(3)
+                .setCellRenderer(datecellrenderer);
+        jtable.getColumnModel().getColumn(4)
+                .setCellRenderer(numbercellrenderer);
+        jtable.getColumnModel().getColumn(5)
+                .setCellRenderer(datecellrenderer);
+        jtable.getColumnModel().getColumn(6)
+                .setCellRenderer(numbercellrenderer);
+        jpanel1.add(new JScrollPane(jtable));
+        jpanel.add(jpanel1, "South");
+        add(jpanel);
+    }
+
+    @Override
+    public void run() {
+
+        Hour hour = new Hour(0, new Day());
+        Minute minute = new Minute(0, hour);
+        Second sec = new Second(59, minute);
+        RegularTimePeriod regulartimeperiod1 = sec;
+        double d1 = 100.90000000000000002D + 0.20000000000000001D * Math.random();
+
+        while(true) {
+
+            for (int k = 0; k < SERIES_COUNT; k++) {
+                series[k].add(regulartimeperiod1, d1);
+
                 d1 *= 1.0D + (Math.random() - 0.495D) / 10D;
             }
-
-            datasets[nrSerii] = new TimeSeriesCollection();
-            datasets[nrSerii].addSeries(series[nrSerii]);
-            return datasets[nrSerii];
-        }
-
-        @Override
-        public void chartChanged(ChartChangeEvent chartchangeevent) {
-            if (chartPanel != null) {
-                JFreeChart jfreechart = chartPanel.getChart();
-                if (jfreechart != null) {
-                    XYPlot xyplot = (XYPlot) jfreechart.getPlot();
-                    XYDataset xydataset = xyplot.getDataset();
-                    Comparable comparable = xydataset.getSeriesKey(0);
-                    double d = xyplot.getDomainCrosshairValue();
-                    model.setValueAt(comparable, 0, 0);
-                    long l = (long) d;
-                    for (int i = 0; i < 1; i++) {
-                        model.setValueAt(Long.valueOf(l), i, 1);
-                        int[] ai = datasets[i].getSurroundingItems(0, l);
-                        long l1 = 0L;
-                        long l2 = 0L;
-                        double d1 = 0.0D;
-                        double d2 = 0.0D;
-                        if (ai[0] >= 0) {
-                            TimeSeriesDataItem timeseriesdataitem =
-                                    series[i].getDataItem(ai[0]);
-                            l1 = timeseriesdataitem.getPeriod()
-                                    .getMiddleMillisecond();
-                            Number number = timeseriesdataitem.getValue();
-                            if (number != null) {
-                                d1 = number.doubleValue();
-                                model.setValueAt(new Double(d1), i, 4);
-                            } else {
-                                model.setValueAt(null, i, 4);
-                            }
-                            model.setValueAt(Long.valueOf(l1), i, 3);
-                        } else {
-                            model.setValueAt(new Double(0.0D), i, 4);
-                            model.setValueAt(new Double(xyplot.getDomainAxis()
-                                    .getRange().getLowerBound()), i, 3);
-                        }
-                        if (ai[1] >= 0) {
-                            TimeSeriesDataItem timeseriesdataitem1 =
-                                    series[i].getDataItem(ai[1]);
-                            l2 = timeseriesdataitem1.getPeriod()
-                                    .getMiddleMillisecond();
-                            Number number1 = timeseriesdataitem1.getValue();
-                            if (number1 != null) {
-                                d2 = number1.doubleValue();
-                                model.setValueAt(new Double(d2), i, 6);
-                            } else {
-                                model.setValueAt(null, i, 6);
-                            }
-                            model.setValueAt(Long.valueOf(l2), i, 5);
-                        } else {
-                            model.setValueAt(new Double(0.0D), i, 6);
-                            model.setValueAt(new Double(xyplot.getDomainAxis()
-                                    .getRange().getUpperBound()), i, 5);
-                        }
-                        double d3 = 0.0D;
-                        if (l2 - l1 > 0L) {
-                            d3 = d1 + (((double) l - (double) l1)
-                                    / ((double) l2 - (double) l1)) * (d2 - d1);
-                        } else {
-                            d3 = d1;
-                        }
-                        model.setValueAt(new Double(d3), i, 2);
-                    }
-                }
+            regulartimeperiod1 = regulartimeperiod1.next();
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(GraphTest.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
 
-        private JFreeChart createChart() {
-            JFreeChart jfreechart = ChartFactory.createTimeSeriesChart(
-                        "Progressive test", "Time", "Hr",
-                        null, true, false, false);
-            XYPlot xyplot = (XYPlot) jfreechart.getPlot();
-            XYDataset[] axydataset = new XYDataset[1];
-            Hour hour = new Hour(0, new Day());
-            Minute minute = new Minute(0, hour);
-            Second sec = new Second(0, minute);
-
-            for (int i = 0; i < 1; i++) {
-                axydataset[i] = createDataset(i, "Series " + i, 100D
-                        + (double) i * 200D, sec, 200);
-                if (i == 0) {
-                    xyplot.setDataset(axydataset[i]);
-                } else {
-                    xyplot.setDataset(i, axydataset[i]);
-                    xyplot.setRangeAxis(i, new NumberAxis("Axis " + (i + 1)));
-                    xyplot.mapDatasetToRangeAxis(i, i);
-                    xyplot.setRenderer(i,
-                                      new XYLineAndShapeRenderer(true, false));
-                }
-            }
-
-            jfreechart.addChangeListener(this);
-            jfreechart.addProgressListener(this);
-            xyplot.setOrientation(PlotOrientation.VERTICAL);
-            xyplot.setDomainCrosshairVisible(true);
-            xyplot.setDomainCrosshairLockedOnData(false);
-            xyplot.setRangeCrosshairVisible(false);
-
-            DateAxis dateaxis = (DateAxis)xyplot.getDomainAxis();
-            RelativeDateFormat relativedateformat = new RelativeDateFormat(sec.getFirstMillisecond());
-            relativedateformat.setSecondFormatter(new DecimalFormat("00"));
-            dateaxis.setDateFormatOverride(relativedateformat);
-            ChartUtilities.applyCurrentTheme(jfreechart);
-
-            return jfreechart;
-        }
-
-        @Override
-        public void chartProgress(ChartProgressEvent chartprogressevent) {
-            if (chartprogressevent.getType() != 2) {
-                return;
-            }
-            if (chartPanel != null) {
-                JFreeChart jfreechart = chartPanel.getChart();
-                if (jfreechart != null) {
-                    XYPlot xyplot = (XYPlot) jfreechart.getPlot();
-                    XYDataset xydataset = xyplot.getDataset();
-                    Comparable comparable = xydataset.getSeriesKey(0);
-                    double d = xyplot.getDomainCrosshairValue();
-                    model.setValueAt(comparable, 0, 0);
-                    long l = (long) d;
-                    model.setValueAt(Long.valueOf(l), 0, 1);
-                    for (int i = 0; i < 1; i++) {
-                        int j = series[i].getIndex(new Second(new Date(l)));
-                        if (j >= 0) {
-                            TimeSeriesDataItem timeseriesdataitem =
-                                    series[i].getDataItem(
-                                    Math.min(199, Math.max(0, j)));
-                            TimeSeriesDataItem timeseriesdataitem1 =
-                                    series[i].getDataItem(Math.max(0, j - 1));
-                            TimeSeriesDataItem timeseriesdataitem2 =
-                                    series[i].getDataItem(Math.min(199, j + 1));
-                            long l1 = timeseriesdataitem.getPeriod()
-                                    .getMiddleMillisecond();
-                            double d1 = timeseriesdataitem.getValue()
-                                    .doubleValue();
-                            long l2 = timeseriesdataitem1.getPeriod()
-                                    .getMiddleMillisecond();
-                            double d2 = timeseriesdataitem1.getValue()
-                                    .doubleValue();
-                            long l3 = timeseriesdataitem2.getPeriod()
-                                    .getMiddleMillisecond();
-                            double d3 = timeseriesdataitem2.getValue()
-                                    .doubleValue();
-                            model.setValueAt(Long.valueOf(l1), i, 1);
-                            model.setValueAt(new Double(d1), i, 2);
-                            model.setValueAt(Long.valueOf(l2), i, 3);
-                            model.setValueAt(new Double(d2), i, 4);
-                            model.setValueAt(Long.valueOf(l3), i, 5);
-                            model.setValueAt(new Double(d3), i, 6);
-                        }
-                    }
-                }
-            }
-        }
-
-        public MyDemoPanel() {
-            super(new BorderLayout());
-            datasets = new TimeSeriesCollection[1];
-            series = new TimeSeries[1];
-            JPanel jpanel = new JPanel(new BorderLayout());
-            JFreeChart jfreechart = createChart();
-            addChart(jfreechart);
-            chartPanel = new ChartPanel(jfreechart);
-            chartPanel.setPreferredSize(new Dimension(600, 270));
-            chartPanel.setDomainZoomable(true);
-            chartPanel.setRangeZoomable(true);
-            javax.swing.border.CompoundBorder compoundborder =
-                    BorderFactory.createCompoundBorder(
-                    BorderFactory.createEmptyBorder(4, 4, 4, 4),
-                    BorderFactory.createEtchedBorder());
-            chartPanel.setBorder(compoundborder);
-            jpanel.add(chartPanel);
-            JPanel jpanel1 = new JPanel(new BorderLayout());
-            jpanel1.setPreferredSize(new Dimension(400, 120));
-            jpanel1.setBorder(BorderFactory.createEmptyBorder(0, 4, 4, 4));
-            model = new DemoTableModel(1);
-            for (int i = 0; i < 1; i++) {
-                XYPlot xyplot = (XYPlot) jfreechart.getPlot();
-                model.setValueAt(xyplot.getDataset(i).getSeriesKey(0), i, 0);
-                model.setValueAt(new Double("0.00"), i, 1);
-                model.setValueAt(new Double("0.00"), i, 2);
-                model.setValueAt(new Double("0.00"), i, 3);
-                model.setValueAt(new Double("0.00"), i, 4);
-                model.setValueAt(new Double("0.00"), i, 5);
-                model.setValueAt(new Double("0.00"), i, 6);
-            }
-
-            JTable jtable = new JTable(model);
-            DateCellRenderer datecellrenderer =
-                    new DateCellRenderer(
-                        new SimpleDateFormat("HH:mm:ss", Config.LOCALE));
-            NumberCellRenderer numbercellrenderer = new NumberCellRenderer();
-            jtable.getColumnModel().getColumn(1)
-                    .setCellRenderer(datecellrenderer);
-            jtable.getColumnModel().getColumn(2)
-                    .setCellRenderer(numbercellrenderer);
-            jtable.getColumnModel().getColumn(3)
-                    .setCellRenderer(datecellrenderer);
-            jtable.getColumnModel().getColumn(4)
-                    .setCellRenderer(numbercellrenderer);
-            jtable.getColumnModel().getColumn(5)
-                    .setCellRenderer(datecellrenderer);
-            jtable.getColumnModel().getColumn(6)
-                    .setCellRenderer(numbercellrenderer);
-            jpanel1.add(new JScrollPane(jtable));
-            jpanel.add(jpanel1, "South");
-            add(jpanel);
-        }
-    }
-
-    public Graph(String s) {
-        super(s);
-        setContentPane(new MyDemoPanel());
-    }
-
-    public static JPanel createDemoPanel() {
-        return new MyDemoPanel();
-    }
-
-    public static void main(String[] args) {
-        Graph crosshairdemo2 = new Graph("JFreeChart: CrosshairDemo2.java");
-        crosshairdemo2.pack();
-        RefineryUtilities.centerFrameOnScreen(crosshairdemo2);
-        crosshairdemo2.setVisible(true);
     }
 }
+

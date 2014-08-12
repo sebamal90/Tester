@@ -24,6 +24,10 @@ public class DataTableModel extends AbstractTableModel {
         columns = new String[]{"Time", "Hr"};
     }
 
+    public void setDataTableModel(List<HrData> aDatas) {
+        this.datas = aDatas;
+    }
+
     @Override
     public int getRowCount() {
         return datas.size();

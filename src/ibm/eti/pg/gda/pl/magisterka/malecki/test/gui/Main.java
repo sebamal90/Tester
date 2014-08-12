@@ -58,7 +58,7 @@ public class Main {
 
     public Main() throws IOException {
         frame = new JFrame("Test");
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         //frame.setMinimumSize(new Dimension(800, 600));
 

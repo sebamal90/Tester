@@ -21,13 +21,16 @@ public class DataTable extends JPanel implements Runnable {
     //private final JScrollPane scrollPane;
     private final JTable table;
     private boolean work;
+    private final DataTableModel model;
+    private final TestResource testResource;
 
-    public DataTable(TestResource testResource) {
+    public DataTable(TestResource aTestResource) {
         super();
+        testResource = aTestResource;
         setLayout(new BorderLayout());
         JLabel title = new JLabel("Data Table:");
         work = true;
-        DataTableModel model = new DataTableModel(testResource.getDatas());
+        model = new DataTableModel(testResource.getDatas());
         table = new JTable(model);
 
         TableColumn column = null;
@@ -70,6 +73,7 @@ public class DataTable extends JPanel implements Runnable {
     @Override
     public void run() {
         while (work) {
+            model.setDataTableModel(testResource.getDatas());
             table.revalidate();
             try {
                 Thread.sleep(1000);
