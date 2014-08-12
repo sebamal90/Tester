@@ -43,15 +43,15 @@ public class Menu extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 String action = e.getActionCommand();
                 if (action.equals("Start")) {
-                    if (main.getHeartBeat() != null) {
+                    if (main.getHeartBeat() == null) {
+                        System.out.println("Don't connected with hr Listener");
+                    } else {
                         testResource.startTest();
                         startStopButton.setText("End");
                         pauseResumeButton.setEnabled(true);
-                    } else {
-                        System.out.println("Don't connected with hr Listener");
                     }
                 } else if (action.equals("End")) {
-                    main.close();
+                    main.closeWindow();
                 } else if (action.equals("Pause")) {
                     testResource.pauseTest();
                     pauseResumeButton.setText("Resume");

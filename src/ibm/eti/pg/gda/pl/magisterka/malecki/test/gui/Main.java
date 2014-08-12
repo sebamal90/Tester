@@ -110,7 +110,7 @@ public class Main {
             public void actionPerformed(ActionEvent e) {
                 String action = e.getActionCommand();
                 if (action.equals("Exit")) {
-                    close();
+                    closeWindow();
                 }
             }
         };
@@ -186,7 +186,7 @@ public class Main {
         return panel;
     }
 
-    public void close() {
+    public void closeWindow() {
         monitor.monitorUpdaterStop();
         if (menu.getDataTable() != null) {
             menu.getDataTable().stop();

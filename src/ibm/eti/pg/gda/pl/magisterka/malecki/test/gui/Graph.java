@@ -78,7 +78,6 @@ public class Graph extends JPanel
                               RegularTimePeriod regulartimeperiod, int j) {
         series[nrSerii] = new TimeSeries(nazwaSerii);
         RegularTimePeriod regulartimeperiod1 = regulartimeperiod;
-        long time = 0;
         double d1 = d;
 
         for (int k = 0; k < j; k++) {
@@ -116,11 +115,11 @@ public class Graph extends JPanel
                         l1 = timeseriesdataitem.getPeriod()
                                 .getMiddleMillisecond();
                         Number number = timeseriesdataitem.getValue();
-                        if (number != null) {
+                        if (number == null) {
+                            model.setValueAt(null, i, 4);
+                        } else {
                             d1 = number.doubleValue();
                             model.setValueAt(new Double(d1), i, 4);
-                        } else {
-                            model.setValueAt(null, i, 4);
                         }
                         model.setValueAt(Long.valueOf(l1), i, 3);
                     } else {
@@ -134,11 +133,11 @@ public class Graph extends JPanel
                         l2 = timeseriesdataitem1.getPeriod()
                                 .getMiddleMillisecond();
                         Number number1 = timeseriesdataitem1.getValue();
-                        if (number1 != null) {
+                        if (number1 == null) {
+                            model.setValueAt(null, i, 6);
+                        } else {
                             d2 = number1.doubleValue();
                             model.setValueAt(new Double(d2), i, 6);
-                        } else {
-                            model.setValueAt(null, i, 6);
                         }
                         model.setValueAt(Long.valueOf(l2), i, 5);
                     } else {

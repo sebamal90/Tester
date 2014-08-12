@@ -54,11 +54,10 @@ public class MessageReader implements Runnable {
             if (msg == 254) {
                 printMessage("\n" + System.currentTimeMillis() + ": ");
                 polarMessageTmp = new PolarMessage(System.currentTimeMillis());
-            } else if (polarMessageTmp != null) {
-                if (polarMessageTmp.setNextValue(msg)) {
-                    message = new PolarMessage(System.currentTimeMillis());
-                    message.setHr(polarMessageTmp.getHr());
-                }
+            } else if (polarMessageTmp != null
+                    && polarMessageTmp.setNextValue(msg)) {
+                message = new PolarMessage(System.currentTimeMillis());
+                message.setHr(polarMessageTmp.getHr());
             }
             if (i - System.currentTimeMillis() > 3000) {
                 System.out.println("Zbyt długi czas oczekiwania");

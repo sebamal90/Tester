@@ -117,10 +117,10 @@ public class BTDevice {
             connection = (StreamConnection) Connector
                     .open("btspp://" + deviceAddress
                     + ":1;authenticate=false;encrypt=false;master=true");
+            return connection;
         } catch (Exception e) {
             System.out.println("Błąd połączenia z urządzeniem");
-        } finally {
-            return connection;
+            return null;
         }
     }
 }
