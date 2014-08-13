@@ -191,6 +191,9 @@ public class Main {
         if (menu.getDataTable() != null) {
             menu.getDataTable().stop();
         }
+        if (menu.getGraph()  != null) {
+            menu.getGraph().stop();
+        }
         if (hb != null) {
             hb.stopRead();
         }
@@ -265,7 +268,6 @@ public class Main {
                 if (message.getTime() == lastMessage.getTime()
                     && System.currentTimeMillis()
                         - lastMessage.getTime() > 3000) {
-                    hr = (int) (hr * 0.8);
                     monitor.setHeartRate(hr + "!");
                 } else {
                     lastMessage = message;

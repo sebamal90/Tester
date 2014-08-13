@@ -5,6 +5,7 @@
 
 package ibm.eti.pg.gda.pl.magisterka.malecki.test.gui;
 
+import ibm.eti.pg.gda.pl.magisterka.malecki.test.api.TestResource;
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.core.Config;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -14,6 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
@@ -53,12 +55,14 @@ import org.jfree.ui.NumberCellRenderer;
 public class Graph extends JPanel
     implements ChartChangeListener, ChartProgressListener, Runnable {
 
-    private static final int SERIES_COUNT = 3;
+    private static final int SERIES_COUNT = 1;
     private TimeSeriesCollection[] datasets;
     private TimeSeries[] series;
     private ChartPanel chartPanel;
     private GraphTableModel model;
     private List charts;
+    private final Main main;
+    private boolean work = true;
 
     public void addChart(JFreeChart jfreechart) {
         charts.add(jfreechart);
@@ -80,6 +84,7 @@ public class Graph extends JPanel
         RegularTimePeriod regulartimeperiod1 = regulartimeperiod;
         double d1 = d;
 
+        series[nrSerii].add(regulartimeperiod1, 0);
         for (int k = 0; k < j; k++) {
             series[nrSerii].add(regulartimeperiod1, d1);
             regulartimeperiod1 = regulartimeperiod1.next();
@@ -167,10 +172,11 @@ public class Graph extends JPanel
         Hour hour = new Hour(0, new Day());
         Minute minute = new Minute(0, hour);
         Second sec = new Second(0, minute);
+
         String[] seriesName = {"Hr", "Power", "Lactate"};
         for (int i = 0; i < SERIES_COUNT; i++) {
             axydataset[i] = createDataset(i, seriesName[i], 100D
-                    + (double) i * 200D, sec, 59);
+                    + (double) i * 200D, sec, 0);
             if (i == 0) {
                 xyplot.setDataset(axydataset[i]);
             } else {
@@ -248,8 +254,9 @@ public class Graph extends JPanel
         }
     }
 
-    public Graph() {
+    public Graph(Main aMain) {
         super(new BorderLayout());
+        main = aMain;
         charts = new ArrayList();
         datasets = new TimeSeriesCollection[SERIES_COUNT];
         series = new TimeSeries[SERIES_COUNT];
@@ -306,27 +313,52 @@ public class Graph extends JPanel
         add(jpanel);
     }
 
+    public void stop() {
+        work = false;
+    }
+
+    public void startGraph() {
+        work = true;
+    }
+
     @Override
     public void run() {
 
-        Hour hour = new Hour(0, new Day());
-        Minute minute = new Minute(0, hour);
-        Second sec = new Second(59, minute);
-        RegularTimePeriod regulartimeperiod1 = sec;
+        TestResource testResource = main.getTestResource();
         double d1 = 100.90000000000000002D + 0.20000000000000001D * Math.random();
+        String lastTime="0:0";
 
-        while(true) {
-
-            for (int k = 0; k < SERIES_COUNT; k++) {
-                series[k].add(regulartimeperiod1, d1);
-
-                d1 *= 1.0D + (Math.random() - 0.495D) / 10D;
-            }
-            regulartimeperiod1 = regulartimeperiod1.next();
+        while(work) {
             try {
-                Thread.sleep(500);
+                Thread.sleep(1000);
             } catch (InterruptedException ex) {
-                Logger.getLogger(GraphTest.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(Graph.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            if (testResource.isTestStatus()) {
+                long time = testResource.getTime();
+                int sec = (int) (TimeUnit.MILLISECONDS.toSeconds(time)
+                        - TimeUnit.MINUTES.toSeconds(
+                          TimeUnit.MILLISECONDS.toMinutes(time)));
+
+                int min = (int)TimeUnit.MILLISECONDS.toMinutes(time);
+
+                if (!lastTime.equals(min + ":" + sec)) {
+                    lastTime = min + ":" + sec;
+
+                    Hour hour = new Hour(0, new Day());
+                    Minute minute = new Minute(min, hour);
+                    Second second = new Second(sec, minute);
+                    RegularTimePeriod regulartimeperiod1 = second;
+
+                    series[0].add(regulartimeperiod1, main.getHeartBeat().getHR());
+
+                        for (int k = 1; k < SERIES_COUNT; k++) {
+                            series[k].add(regulartimeperiod1, d1);
+
+                            d1 *= 1.0D + (Math.random() - 0.495D) / 10D;
+                        }
+                }
             }
         }
 

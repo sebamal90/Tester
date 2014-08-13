@@ -25,9 +25,9 @@ public class TestResource {
 
     public void startTest() {
         dataSaver = new DataSaver(main);
-        testStatus = true;
         dataSaver.setName("Data Saver Thread");
         dataSaver.start();
+        testStatus = true;
     }
 
     public void pauseTest() {
@@ -49,6 +49,10 @@ public class TestResource {
 
     public boolean isTestStatus() {
         return testStatus;
+    }
+
+    public long getTime() {
+        return dataSaver.getTime();
     }
 
     public String getTimer() {

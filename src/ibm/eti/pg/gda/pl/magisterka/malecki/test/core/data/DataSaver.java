@@ -70,6 +70,7 @@ public class DataSaver extends Thread {
     }
 
     public long getTime() {
+        if (startTime == 0) return 0;
         return System.currentTimeMillis() - startTime - pauseTime;
     }
 

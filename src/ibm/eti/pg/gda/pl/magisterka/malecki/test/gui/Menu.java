@@ -72,7 +72,7 @@ public class Menu extends JPanel {
                 } else if (action.equals("Graph")) {
                     main.getPanel().removeAll();
                     if (graph == null) {
-                        graph = new Graph();
+                        graph = new Graph(main);
                         Thread t = new Thread((Runnable) graph);
                         t.setName("Graph Thread");
                         t.start();
@@ -154,6 +154,10 @@ public class Menu extends JPanel {
 
     public DataTable getDataTable() {
         return dT;
+    }
+
+    public Graph getGraph() {
+        return graph;
     }
 }
 
