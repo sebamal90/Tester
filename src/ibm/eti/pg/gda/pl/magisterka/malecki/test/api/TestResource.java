@@ -71,10 +71,14 @@ public class TestResource {
     }
 
     public List<DataSaver.HrData> getDatas()  {
+        List<DataSaver.HrData> dataList;
+
         if (dataSaver == null) {
-            return new ArrayList<DataSaver.HrData>();
+            dataList = new ArrayList<DataSaver.HrData>();
         } else {
-            return dataSaver.getHrData();
+            dataList = dataSaver.getHrData();
         }
+
+        return dataList;
     }
 }

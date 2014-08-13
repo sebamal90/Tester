@@ -29,7 +29,7 @@ public class PolarMessage extends Message {
     private int chk;
     private int seq;
     private int status;
-    private int i = 0;
+    private int messagePart = 0;
 
     public PolarMessage(long time) {
         super();
@@ -37,25 +37,27 @@ public class PolarMessage extends Message {
     }
 
     public boolean setNextValue(int value) {
-        if (i == 0) {
+        boolean isEndMessage = false;
+
+        if (messagePart == 0) {
             setLen(value);
-        } else if (i == 1) {
+        } else if (messagePart == 1) {
             setChk(value);
-        } else if (i == 2) {
+        } else if (messagePart == 2) {
             setSeq(value);
-        } else if (i == 3) {
+        } else if (messagePart == 3) {
             setStatus(value >> 4);
-        } else if (i == 4) {
-            i++;
-            setHr(value);
+        } else if (messagePart == 4) {
             if (!isValid()) {
                 System.out.println("Nieprawidłowa wiadomość");
-                return false;
+                isEndMessage = false;
+            } else {
+                setHr(value);
+                isEndMessage = true;
             }
-            return true;
         }
-        i++;
-        return false;
+        messagePart++;
+        return isEndMessage;
     }
 
     public void setLen(int aLen) {

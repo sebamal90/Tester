@@ -70,8 +70,11 @@ public class DataSaver extends Thread {
     }
 
     public long getTime() {
-        if (startTime == 0) return 0;
-        return System.currentTimeMillis() - startTime - pauseTime;
+        long time = 0;
+        if (startTime != 0) {
+            time = System.currentTimeMillis() - startTime - pauseTime;
+        }
+        return time;
     }
 
     public List<HrData> getHrData() {
@@ -112,20 +115,20 @@ public class DataSaver extends Thread {
     }
 
     public static class HrData {
-        private int hr = -1;
+        private int heartRate = -1;
         private long time = -1;
 
         public HrData(long aTime, int aHr) {
             this.time = aTime;
-            this.hr = aHr;
+            this.heartRate = aHr;
         }
 
         public void setHr(int aHr) {
-            this.hr = aHr;
+            this.heartRate = aHr;
         }
 
         public int getHr() {
-            return hr;
+            return heartRate;
         }
 
         public void setTime(long aTime) {

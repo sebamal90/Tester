@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package ibm.eti.pg.gda.pl.magisterka.malecki.test.gui;
 
 import javax.swing.table.AbstractTableModel;
@@ -17,9 +12,9 @@ public class GraphTableModel extends AbstractTableModel
     private Object[][] data;
 
 
-    public GraphTableModel(int i) {
+    public GraphTableModel(int rows) {
         super();
-        data = new Object[i][7];
+        data = new Object[rows][7];
     }
 
     public int getColumnCount() {
@@ -30,34 +25,43 @@ public class GraphTableModel extends AbstractTableModel
         return data.length;
     }
 
-    public Object getValueAt(int i, int j) {
-        return data[i][j];
+    public Object getValueAt(int row, int column) {
+        return data[row][column];
     }
 
-    public void setValueAt(Object obj, int i, int j) {
-        data[i][j] = obj;
+    public void setValueAt(Object obj, int row, int column) {
+        data[row][column] = obj;
         fireTableDataChanged();
     }
 
-    public String getColumnName(int i) {
-        switch (i) {
+    public String getColumnName(int column) {
+        String columnName = null;
+
+        switch (column) {
         case 0: // '\0'
-            return "Series Name:";
+            columnName = "Series Name:";
+            break;
         case 1: // '\001'
-            return "X:";
+            columnName = "X:";
+            break;
         case 2: // '\002'
-            return "Y:";
+            columnName = "Y:";
+            break;
         case 3: // '\003'
-            return "X (prev)";
+            columnName = "X (prev)";
+            break;
         case 4: // '\004'
-            return "Y (prev):";
+            columnName = "Y (prev):";
+            break;
         case 5: // '\005'
-            return "X (next):";
+            columnName = "X (next):";
+            break;
         case 6: // '\006'
-            return "Y (next):";
+            columnName = "Y (next):";
+            break;
         default:
             break;
         }
-        return null;
+        return columnName;
     }
 }

@@ -10,15 +10,15 @@ package ibm.eti.pg.gda.pl.magisterka.malecki.test.core.device;
  */
 public class Message {
 
-    private int hr = -1;
+    private int heartRate = -1;
     private long time = -1;
 
     public void setHr(int aHr) {
-        this.hr = aHr;
+        this.heartRate = aHr;
     }
 
     public int getHr() {
-        return hr;
+        return heartRate;
     }
 
     public void setTime(long aTime) {
@@ -30,6 +30,6 @@ public class Message {
     }
 
     public boolean isValid() {
-        return time != -1 && hr != -1;
+        return time != -1 && heartRate != -1;
     }
 }

@@ -26,7 +26,7 @@ public class Menu extends JPanel {
     private JSeparator menuSeparator;
     private JPanel menuPanel;
     private final Main main;
-    private DataTable dT;
+    private DataTable dataTable;
     private Graph graph;
     private final JButton statsGraphButton;
 
@@ -40,8 +40,8 @@ public class Menu extends JPanel {
 
         ActionListener menuListener = new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                String action = e.getActionCommand();
+            public void actionPerformed(ActionEvent event) {
+                String action = event.getActionCommand();
                 if (action.equals("Start")) {
                     if (main.getHeartBeat() == null) {
                         System.out.println("Don't connected with hr Listener");
@@ -60,22 +60,22 @@ public class Menu extends JPanel {
                     pauseResumeButton.setText("Pause");
                 } else if (action.equals("Stats")) {
                     main.getPanel().removeAll();
-                    if (dT == null) {
-                        dT = new DataTable(testResource);
-                        Thread t = new Thread((Runnable) dT);
-                        t.setName("DataTable Thread");
-                        t.start();
+                    if (dataTable == null) {
+                        dataTable = new DataTable(testResource);
+                        Thread thread = new Thread((Runnable) dataTable);
+                        thread.setName("DataTable Thread");
+                        thread.start();
                     }
                     statsGraphButton.setText("Graph");
-                    main.getPanel().add(dT);
+                    main.getPanel().add(dataTable);
                     main.getPanel().updateUI();
                 } else if (action.equals("Graph")) {
                     main.getPanel().removeAll();
                     if (graph == null) {
                         graph = new Graph(main);
-                        Thread t = new Thread((Runnable) graph);
-                        t.setName("Graph Thread");
-                        t.start();
+                        Thread thread = new Thread((Runnable) graph);
+                        thread.setName("Graph Thread");
+                        thread.start();
                     }
                     statsGraphButton.setText("Stats");
                     main.getPanel().add(graph);
@@ -153,11 +153,10 @@ public class Menu extends JPanel {
    }
 
     public DataTable getDataTable() {
-        return dT;
+        return dataTable;
     }
 
     public Graph getGraph() {
         return graph;
     }
 }
-

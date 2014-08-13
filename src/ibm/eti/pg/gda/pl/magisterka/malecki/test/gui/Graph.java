@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package ibm.eti.pg.gda.pl.magisterka.malecki.test.gui;
 
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.api.TestResource;
@@ -52,7 +47,7 @@ import org.jfree.ui.NumberCellRenderer;
  *
  * @author SebaTab
  */
-public class Graph extends JPanel
+public final class Graph extends JPanel
     implements ChartChangeListener, ChartProgressListener, Runnable {
 
     private static final int SERIES_COUNT = 1;
@@ -69,27 +64,21 @@ public class Graph extends JPanel
     }
 
     public JFreeChart[] getCharts() {
-        int i = charts.size();
-        JFreeChart[] ajfreechart = new JFreeChart[i];
-        for (int j = 0; j < i; j++) {
+        int chartSize = charts.size();
+        JFreeChart[] ajfreechart = new JFreeChart[chartSize];
+        for (int j = 0; j < chartSize; j++) {
             ajfreechart[j] = (JFreeChart) charts.get(j);
         }
 
         return ajfreechart;
     }
 
-    private XYDataset createDataset(int nrSerii, String nazwaSerii, double d,
-                              RegularTimePeriod regulartimeperiod, int j) {
+    private XYDataset createDataset(int nrSerii, String nazwaSerii,
+                              RegularTimePeriod regulartimeperiod) {
         series[nrSerii] = new TimeSeries(nazwaSerii);
-        RegularTimePeriod regulartimeperiod1 = regulartimeperiod;
-        double d1 = d;
+        RegularTimePeriod regulartime = regulartimeperiod;
 
-        series[nrSerii].add(regulartimeperiod1, 0);
-        for (int k = 0; k < j; k++) {
-            series[nrSerii].add(regulartimeperiod1, d1);
-            regulartimeperiod1 = regulartimeperiod1.next();
-            d1 *= 1.0D + (Math.random() - 0.495D) / 10D;
-        }
+        series[nrSerii].add(regulartime, 0);
 
         datasets[nrSerii] = new TimeSeriesCollection();
         datasets[nrSerii].addSeries(series[nrSerii]);
@@ -104,9 +93,9 @@ public class Graph extends JPanel
                 XYPlot xyplot = (XYPlot) jfreechart.getPlot();
                 XYDataset xydataset = xyplot.getDataset();
                 Comparable comparable = xydataset.getSeriesKey(0);
-                double d = xyplot.getDomainCrosshairValue();
+
                 model.setValueAt(comparable, 0, 0);
-                long l = (long) d;
+                long l = (long) xyplot.getDomainCrosshairValue();
                 for (int i = 0; i < SERIES_COUNT; i++) {
                     model.setValueAt(Long.valueOf(l), i, 1);
                     int[] ai = datasets[i].getSurroundingItems(0, l);
@@ -175,14 +164,16 @@ public class Graph extends JPanel
 
         String[] seriesName = {"Hr", "Power", "Lactate"};
         for (int i = 0; i < SERIES_COUNT; i++) {
-            axydataset[i] = createDataset(i, seriesName[i], 100D
-                    + (double) i * 200D, sec, 0);
+            axydataset[i] = createDataset(i, seriesName[i], sec);
             if (i == 0) {
                 xyplot.setDataset(axydataset[i]);
             } else {
                 xyplot.setDataset(i, axydataset[i]);
-                if (i < 3) xyplot.setRangeAxis(i, new NumberAxis(seriesName[i]));
-                else xyplot.setRangeAxis(i, new NumberAxis("Axis " + (i + 1)));
+                if (i < 3) {
+                    xyplot.setRangeAxis(i, new NumberAxis(seriesName[i]));
+                } else {
+                    xyplot.setRangeAxis(i, new NumberAxis("Axis " + (i + 1)));
+                }
                 xyplot.mapDatasetToRangeAxis(i, i);
                 xyplot.setRenderer(i,
                                   new XYLineAndShapeRenderer(true, false));
@@ -196,8 +187,9 @@ public class Graph extends JPanel
         xyplot.setDomainCrosshairLockedOnData(false);
         xyplot.setRangeCrosshairVisible(false);
 
-        DateAxis dateaxis = (DateAxis)xyplot.getDomainAxis();
-        RelativeDateFormat relativedateformat = new RelativeDateFormat(sec.getFirstMillisecond());
+        DateAxis dateaxis = (DateAxis) xyplot.getDomainAxis();
+        RelativeDateFormat relativedateformat =
+                new RelativeDateFormat(sec.getFirstMillisecond());
         relativedateformat.setSecondFormatter(new DecimalFormat("00"));
         dateaxis.setDateFormatOverride(relativedateformat);
         ChartUtilities.applyCurrentTheme(jfreechart);
@@ -325,14 +317,14 @@ public class Graph extends JPanel
     public void run() {
 
         TestResource testResource = main.getTestResource();
-        double d1 = 100.90000000000000002D + 0.20000000000000001D * Math.random();
-        String lastTime="0:0";
+        String lastTime = "0:0";
 
-        while(work) {
+        while (work) {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException ex) {
-                Logger.getLogger(Graph.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(Graph.class.getName())
+                        .log(Level.SEVERE, null, ex);
             }
 
             if (testResource.isTestStatus()) {
@@ -341,7 +333,7 @@ public class Graph extends JPanel
                         - TimeUnit.MINUTES.toSeconds(
                           TimeUnit.MILLISECONDS.toMinutes(time)));
 
-                int min = (int)TimeUnit.MILLISECONDS.toMinutes(time);
+                int min = (int) TimeUnit.MILLISECONDS.toMinutes(time);
 
                 if (!lastTime.equals(min + ":" + sec)) {
                     lastTime = min + ":" + sec;
@@ -349,19 +341,12 @@ public class Graph extends JPanel
                     Hour hour = new Hour(0, new Day());
                     Minute minute = new Minute(min, hour);
                     Second second = new Second(sec, minute);
-                    RegularTimePeriod regulartimeperiod1 = second;
+                    RegularTimePeriod regulartime = second;
 
-                    series[0].add(regulartimeperiod1, main.getHeartBeat().getHR());
-
-                        for (int k = 1; k < SERIES_COUNT; k++) {
-                            series[k].add(regulartimeperiod1, d1);
-
-                            d1 *= 1.0D + (Math.random() - 0.495D) / 10D;
-                        }
+                    series[0].add(regulartime, main.getHeartBeat().getHR());
                 }
             }
         }
 
     }
 }
-

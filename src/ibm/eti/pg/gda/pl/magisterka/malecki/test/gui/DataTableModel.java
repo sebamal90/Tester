@@ -41,11 +41,19 @@ public class DataTableModel extends AbstractTableModel {
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         HrData data = datas.get(rowIndex);
+        Object value = null;
         switch(columnIndex) {
-            case 0: return convert(data.getTime());
-            case 1: return data.getHr();
-            default: return null;
+            case 0:
+                value = convert(data.getTime());
+                break;
+            case 1:
+                value = data.getHr();
+                break;
+            default:
+                break;
         }
+
+        return value;
     }
 
     @Override
@@ -79,20 +87,31 @@ public class DataTableModel extends AbstractTableModel {
         int sec = (int) (TimeUnit.MILLISECONDS.toSeconds(time)
                 - TimeUnit.MINUTES.toSeconds(
                   TimeUnit.MILLISECONDS.toMinutes(time)));
+        String timeString;
         if (sec < 10) {
-            return  TimeUnit.MILLISECONDS.toMinutes(time) + ":0" + sec;
+            timeString = TimeUnit.MILLISECONDS.toMinutes(time) + ":0" + sec;
         } else {
-            return  TimeUnit.MILLISECONDS.toMinutes(time) + ":" + sec;
+            timeString = TimeUnit.MILLISECONDS.toMinutes(time) + ":" + sec;
         }
+
+        return timeString;
     }
 
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex) {
+        boolean isEditable = true;
         switch(columnIndex) {
-            case 0: return false;
-            case 1: return true;
-            default: return true;
+            case 0:
+                isEditable = false;
+                break;
+            case 1:
+                isEditable = true;
+                break;
+            default:
+                break;
         }
+
+        return isEditable;
     }
 
     @Override

@@ -47,9 +47,9 @@ public class MessageReader implements Runnable {
     }
 
     private void readPolar() throws IOException {
-        long i;
+        long currTime;
         while (isRead) {
-            i = System.currentTimeMillis();
+            currTime = System.currentTimeMillis();
             int msg = inputStream.read();
             if (msg == 254) {
                 printMessage("\n" + System.currentTimeMillis() + ": ");
@@ -59,7 +59,7 @@ public class MessageReader implements Runnable {
                 message = new PolarMessage(System.currentTimeMillis());
                 message.setHr(polarMessageTmp.getHr());
             }
-            if (i - System.currentTimeMillis() > 3000) {
+            if (currTime - System.currentTimeMillis() > 3000) {
                 System.out.println("Zbyt długi czas oczekiwania");
             }
             printMessage(" " + msg);

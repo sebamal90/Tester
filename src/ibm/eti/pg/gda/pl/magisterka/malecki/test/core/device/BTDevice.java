@@ -87,6 +87,7 @@ public class BTDevice {
     }
 
     public StreamConnection connectByName(String deviceName) {
+        StreamConnection results = null;
         if (devices == null) {
             getDevices();
         }
@@ -101,11 +102,11 @@ public class BTDevice {
             if (name.equals(deviceName)) {
                 System.out.println("Trying connect witch "
                         + device.getBluetoothAddress() + "\n");
-                return connect(device.getBluetoothAddress());
+                results = connect(device.getBluetoothAddress());
             }
         }
         System.out.println("Device " + deviceName + " not found");
-        return null;
+        return results;
     }
 
     public StreamConnection connect(String deviceAddress) {
@@ -117,10 +118,11 @@ public class BTDevice {
             connection = (StreamConnection) Connector
                     .open("btspp://" + deviceAddress
                     + ":1;authenticate=false;encrypt=false;master=true");
-            return connection;
         } catch (Exception e) {
             System.out.println("Błąd połączenia z urządzeniem");
-            return null;
+
         }
+        
+        return connection;
     }
 }

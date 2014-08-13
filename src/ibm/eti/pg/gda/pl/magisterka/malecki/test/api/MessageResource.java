@@ -17,16 +17,12 @@ public class MessageResource {
 
     private MessageReader messageReader;
 
-    public MessageResource(Main aMain) {
-        Main main = aMain;
-    }
-
     public void startRead(StreamConnection connection, String messageType) {
         messageReader = new MessageReader(connection, messageType);
 
-        Thread t = new Thread((Runnable) messageReader);
-        t.setName("Message Reader Thread");
-        t.start();
+        Thread thread = new Thread((Runnable) messageReader);
+        thread.setName("Message Reader Thread");
+        thread.start();
     }
 
     public void stopRead() {

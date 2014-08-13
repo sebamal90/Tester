@@ -5,7 +5,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
@@ -27,7 +26,6 @@ public class MessageConsole {
     private JTextComponent textComponent;
     private Document document;
     private boolean isAppend;
-    private DocumentListener limitLinesListener;
 
     public MessageConsole(JTextComponent aTextComponent) {
         this(aTextComponent, true);

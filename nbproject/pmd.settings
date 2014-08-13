@@ -1,3 +1,4 @@
+DoNotUseThreads
 AvoidInstantiatingObjectsInLoops
-LocalVariableCouldBeFinal
 BeanMembersShouldSerialize
+LocalVariableCouldBeFinal

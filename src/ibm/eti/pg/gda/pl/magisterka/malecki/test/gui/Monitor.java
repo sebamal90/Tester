@@ -82,8 +82,8 @@ public class Monitor extends JPanel {
         separator.setPreferredSize(new Dimension(2, 100));
         add(separator);
 
-        SimpleDateFormat ft = new SimpleDateFormat("HH:mm", Config.LOCALE);
-        clockLabel = new JLabel(ft.format(new Date()));
+        SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm", Config.LOCALE);
+        clockLabel = new JLabel(dateFormat.format(new Date()));
         clockLabel.setHorizontalAlignment(SwingConstants.CENTER);
         clockLabel.setPreferredSize(new Dimension(270, 100));
         clockLabel.setFont(clockLabel.getFont().deriveFont(100.0f));
@@ -95,18 +95,18 @@ public class Monitor extends JPanel {
     }
 
     public void monitorUpdaterStart() {
-        MonitorUpdater mU = new MonitorUpdater(testResource);
-        mU.setName("Monitor Updater Thread");
+        MonitorUpdater monitorUp = new MonitorUpdater(testResource);
+        monitorUp.setName("Monitor Updater Thread");
         work = true;
-        mU.start();
+        monitorUp.start();
     }
 
     public void monitorUpdaterStop() {
         work = false;
     }
 
-    public void beat(int i) {
-        if (i == 0) {
+    public void beat(int beat) {
+        if (beat == 0) {
             heart.setIcon(new ImageIcon(heart1));
         } else {
             heart.setIcon(new ImageIcon(heart2));
@@ -114,12 +114,12 @@ public class Monitor extends JPanel {
         }
     }
 
-    public void setHeartRate(String hr) {
-        heartRate.setText(hr);
+    public void setHeartRate(String hrString) {
+        heartRate.setText(hrString);
     }
 
     private class MonitorUpdater extends Thread {
-        private SimpleDateFormat ft =
+        private SimpleDateFormat dateFormat =
                 new SimpleDateFormat("HH:mm", Config.LOCALE);
         private TestResource testResource;
 
@@ -130,15 +130,15 @@ public class Monitor extends JPanel {
 
         @Override
         public void run() {
-            int i = 0;
+            int tmpCount = 0;
             while (work) {
-                clockLabel.setText(ft.format(new Date()));
+                clockLabel.setText(dateFormat.format(new Date()));
                 if (testResource.isTestStatus()) {
                     timeLabel.setText(testResource.getTimer());
-                    powerLabel.setText(i + "W");
+                    powerLabel.setText(tmpCount + "W");
                 }
 
-                i++;
+                tmpCount++;
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException ex) {

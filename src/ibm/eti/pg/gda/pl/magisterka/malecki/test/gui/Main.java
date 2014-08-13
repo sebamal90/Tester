@@ -38,11 +38,11 @@ import javax.swing.JTextPane;
 public class Main {
 
     private JFrame frame;
-    private MessageResource messageResource = new MessageResource(this);
+    private MessageResource messageResource = new MessageResource();
     private BTDeviceResource btdeviceResource = new BTDeviceResource(this);
     private TestResource testResource = new TestResource(this);
     private JTextPane logger = new javax.swing.JTextPane();
-    private HeartBeat hb;
+    private HeartBeat heartBeat;
     private Monitor monitor;
     private JPanel panel;
     private Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
@@ -71,12 +71,12 @@ public class Main {
         frame.getContentPane().
                 addHierarchyBoundsListener(new HierarchyBoundsListener() {
             @Override
-            public void ancestorMoved(HierarchyEvent e) {
+            public void ancestorMoved(HierarchyEvent event) {
                 //not used
             }
 
             @Override
-            public void ancestorResized(HierarchyEvent e) {
+            public void ancestorResized(HierarchyEvent evnt) {
                 menu.updateUI();
                 monitor.setPreferredSize(
                         new Dimension(frame.getWidth() - 115, 100));
@@ -107,8 +107,8 @@ public class Main {
 
         ActionListener menuBarListener = new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                String action = e.getActionCommand();
+            public void actionPerformed(ActionEvent event) {
+                String action = event.getActionCommand();
                 if (action.equals("Exit")) {
                     closeWindow();
                 }
@@ -136,11 +136,9 @@ public class Main {
         logger.setEditable(false);
         loggerScrollPane.setViewportView(logger);
 
-        MessageConsole mc = new MessageConsole(logger);
-        mc.redirectOut();
-        mc.redirectErr(Color.RED, null);
-        //mc.setMessageLines(50);
-
+        MessageConsole messageConsol = new MessageConsole(logger);
+        messageConsol.redirectOut();
+        messageConsol.redirectErr(Color.RED, null);
     }
 
     private void addWorker() throws IOException {
@@ -194,8 +192,8 @@ public class Main {
         if (menu.getGraph()  != null) {
             menu.getGraph().stop();
         }
-        if (hb != null) {
-            hb.stopRead();
+        if (heartBeat != null) {
+            heartBeat.stopRead();
         }
         testResource.stopTest();
         messageResource.stopRead();
@@ -205,23 +203,23 @@ public class Main {
 
     public void connectionEstabilished() {
         System.out.println("Connection estabilished");
-        hb = new HeartBeat();
-        Thread t = new Thread((Runnable) hb);
-        t.setName("Heart Beat Thread");
-        t.start();
+        heartBeat = new HeartBeat();
+        Thread thread = new Thread((Runnable) heartBeat);
+        thread.setName("Heart Beat Thread");
+        thread.start();
     }
 
     public HeartBeat getHeartBeat() {
-        return hb;
+        return heartBeat;
     }
 
     public class HeartBeat implements Runnable {
-        private int hr;
+        private int heartRate;
         private Message lastMessage;
         private boolean read = true;
 
         public HeartBeat() {
-            hr = 0;
+            heartRate = 0;
             lastMessage = new Message();
             lastMessage.setTime(System.currentTimeMillis());
             lastMessage.setHr(0);
@@ -230,8 +228,8 @@ public class Main {
         public void run() {
             while (read) {
                 setHR();
-                if (hr != 0) {
-                    int sleep = 1000 / hr;
+                if (heartRate != 0) {
+                    int sleep = 1000 / heartRate;
 
                     try {
                         Thread.sleep(40 * sleep);
@@ -268,23 +266,23 @@ public class Main {
                 if (message.getTime() == lastMessage.getTime()
                     && System.currentTimeMillis()
                         - lastMessage.getTime() > 3000) {
-                    monitor.setHeartRate(hr + "!");
+                    monitor.setHeartRate(heartRate + "!");
                 } else {
                     lastMessage = message;
-                    hr = lastMessage.getHr();
-                    monitor.setHeartRate(String.valueOf(hr));
+                    heartRate = lastMessage.getHr();
+                    monitor.setHeartRate(String.valueOf(heartRate));
                 }
             }
         }
 
         public void stopRead() {
             read = false;
-            hr = 0;
+            heartRate = 0;
 
         }
 
         public int getHR() {
-            return hr;
+            return heartRate;
         }
     }
 }
