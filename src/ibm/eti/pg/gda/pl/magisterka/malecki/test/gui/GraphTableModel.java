@@ -42,16 +42,16 @@ public class GraphTableModel extends AbstractTableModel
             columnName = "Series Name:";
             break;
         case 1: // '\001'
-            columnName = "X:";
+            columnName = "Time";
             break;
         case 2: // '\002'
-            columnName = "Y:";
+            columnName = "Value";
             break;
         case 3: // '\003'
-            columnName = "X (prev)";
+            columnName = "Avg";
             break;
         case 4: // '\004'
-            columnName = "Y (prev):";
+            columnName = "Max";
             break;
         case 5: // '\005'
             columnName = "X (next):";
