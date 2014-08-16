@@ -1,3 +1,5 @@
+package ibm.eti.pg.gda.pl.magisterka.malecki.test.gui;
+
 import java.awt.BorderLayout;
 
 import javax.swing.JFrame;

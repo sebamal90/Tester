@@ -2,6 +2,7 @@ package ibm.eti.pg.gda.pl.magisterka.malecki.test.gui;
 
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.api.TestResource;
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.core.Config;
+import ibm.eti.pg.gda.pl.magisterka.malecki.test.core.data.DataSaver;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -100,7 +101,7 @@ public final class Graph extends JPanel
         XYDataset[] axydataset = new XYDataset[SERIES_COUNT];
         Hour hour = new Hour(0, new Day());
         Minute minute = new Minute(0, hour);
-        Second sec = new Second(0, minute);
+        Second sec = new Second(1, minute);
 
         String[] seriesName = {
             Config.labels.getString("Graph.hr"),
@@ -266,7 +267,7 @@ public final class Graph extends JPanel
             }
 
             if (testResource.isTestStatus()) {
-                long time = testResource.getTime();
+                /*long time = testResource.getTime();
                 int sec = (int) (TimeUnit.MILLISECONDS.toSeconds(time)
                         - TimeUnit.MINUTES.toSeconds(
                           TimeUnit.MILLISECONDS.toMinutes(time)));
@@ -282,6 +283,29 @@ public final class Graph extends JPanel
                     RegularTimePeriod regulartime = second;
 
                     series[0].add(regulartime, main.getHeartBeat().getHR());
+                }*/
+
+                List<DataSaver.HrData> dataList = testResource.getDatas();
+                for (int i = 0; i < dataList.size(); i++) {
+                    long time = dataList.get(i).getTime();
+                    int sec = (int) (TimeUnit.MILLISECONDS.toSeconds(time)
+                        - TimeUnit.MINUTES.toSeconds(
+                          TimeUnit.MILLISECONDS.toMinutes(time)));
+
+                    int min = (int) TimeUnit.MILLISECONDS.toMinutes(time);
+
+                    Hour hour = new Hour(0, new Day());
+                    Minute minute = new Minute(min, hour);
+                    Second second = new Second(sec, minute);
+                    RegularTimePeriod regulartime = second;
+
+                    if (i == 0 && series[0].getDataItem(0).getPeriod()
+                            .getFirstMillisecond()
+                                != regulartime.getFirstMillisecond()) {
+                        series[0].clear();
+                    }
+                    series[0].addOrUpdate(regulartime,
+                                          dataList.get(i).getHr());
                 }
             }
         }

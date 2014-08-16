@@ -18,6 +18,7 @@ public class TestResource {
     private final Main main;
     private DataSaver dataSaver;
     private boolean testStatus = false;
+    private String phase;
 
     public TestResource(Main aMain) {
         this.main = aMain;
