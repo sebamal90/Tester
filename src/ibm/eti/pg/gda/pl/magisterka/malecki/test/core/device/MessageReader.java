@@ -54,6 +54,10 @@ public class MessageReader implements Runnable {
             if (msg == 254) {
                 printMessage("\n" + System.currentTimeMillis() + ": ");
                 polarMessageTmp = new PolarMessage(System.currentTimeMillis());
+            } else if (msg == -1) {
+                System.out.println("Rozłączono");
+                stopRead();
+                break;
             } else if (polarMessageTmp != null
                     && polarMessageTmp.setNextValue(msg)) {
                 message = new PolarMessage(System.currentTimeMillis());

@@ -54,7 +54,7 @@ public class Main {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws IOException {
-        //Config.saveConfig();
+        Config.saveConfig();
         Config.loadConfig();
         new Main();
     }
