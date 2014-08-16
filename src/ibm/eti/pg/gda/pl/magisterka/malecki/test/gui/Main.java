@@ -7,6 +7,7 @@ package ibm.eti.pg.gda.pl.magisterka.malecki.test.gui;
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.api.BTDeviceResource;
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.api.MessageResource;
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.api.TestResource;
+import ibm.eti.pg.gda.pl.magisterka.malecki.test.core.Config;
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.core.MessageConsole;
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.core.device.Message;
 import java.awt.BorderLayout;
@@ -53,11 +54,13 @@ public class Main {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws IOException {
+        //Config.saveConfig();
+        Config.loadConfig();
         new Main();
     }
 
     public Main() throws IOException {
-        frame = new JFrame("Test");
+        frame = new JFrame(Config.labels.getString("Main.title"));
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         //frame.setMinimumSize(new Dimension(800, 600));
@@ -109,17 +112,20 @@ public class Main {
             @Override
             public void actionPerformed(ActionEvent event) {
                 String action = event.getActionCommand();
-                if (action.equals("Exit")) {
+                if (action.equals(Config.labels.getString("Main.exit"))) {
                     closeWindow();
                 }
             }
         };
 
-        JMenu fileMenu = new JMenu("File");
+        JMenu fileMenu = new JMenu(Config.labels.getString("Main.file"));
         menuBar.add(fileMenu);
-
-        JMenuItem exitItem = fileMenu.add("Exit");
+        JMenuItem propertiesItem = fileMenu.add(Config.labels.getString("Main.properties"));
+        propertiesItem.addActionListener(menuBarListener);
+        fileMenu.addSeparator();
+        JMenuItem exitItem = fileMenu.add(Config.labels.getString("Main.exit"));
         exitItem.addActionListener(menuBarListener);
+
     }
 
     private void addMenu() {

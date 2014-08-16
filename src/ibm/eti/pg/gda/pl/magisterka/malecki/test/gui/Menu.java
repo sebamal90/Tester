@@ -42,23 +42,23 @@ public class Menu extends JPanel {
             @Override
             public void actionPerformed(ActionEvent event) {
                 String action = event.getActionCommand();
-                if (action.equals("Start")) {
+                if (action.equals(Config.labels.getString("Menu.start"))) {
                     if (main.getHeartBeat() == null) {
                         System.out.println("Don't connected with hr Listener");
                     } else {
                         testResource.startTest();
-                        startStopButton.setText("End");
+                        startStopButton.setText(Config.labels.getString("Menu.end"));
                         pauseResumeButton.setEnabled(true);
                     }
-                } else if (action.equals("End")) {
+                } else if (action.equals(Config.labels.getString("Menu.end"))) {
                     main.closeWindow();
-                } else if (action.equals("Pause")) {
+                } else if (action.equals(Config.labels.getString("Menu.pause"))) {
                     testResource.pauseTest();
-                    pauseResumeButton.setText("Resume");
-                } else if (action.equals("Resume")) {
+                    pauseResumeButton.setText(Config.labels.getString("Menu.resume"));
+                } else if (action.equals(Config.labels.getString("Menu.resume"))) {
                     testResource.resumeTest();
-                    pauseResumeButton.setText("Pause");
-                } else if (action.equals("Stats")) {
+                    pauseResumeButton.setText(Config.labels.getString("Menu.pause"));
+                } else if (action.equals(Config.labels.getString("Menu.stats"))) {
                     main.getPanel().removeAll();
                     if (dataTable == null) {
                         dataTable = new DataTable(testResource);
@@ -66,10 +66,10 @@ public class Menu extends JPanel {
                         thread.setName("DataTable Thread");
                         thread.start();
                     }
-                    statsGraphButton.setText("Graph");
+                    statsGraphButton.setText(Config.labels.getString("Menu.graph"));
                     main.getPanel().add(dataTable);
                     main.getPanel().updateUI();
-                } else if (action.equals("Graph")) {
+                } else if (action.equals(Config.labels.getString("Menu.graph"))) {
                     main.getPanel().removeAll();
                     if (graph == null) {
                         graph = new Graph(main);
@@ -77,23 +77,27 @@ public class Menu extends JPanel {
                         thread.setName("Graph Thread");
                         thread.start();
                     }
-                    statsGraphButton.setText("Stats");
+                    statsGraphButton.setText(Config.labels.getString("Menu.stats"));
                     main.getPanel().add(graph);
                     main.getPanel().updateUI();
-                } else if (action.equals("Connect")) {
-                    bTDeviceResource.connect(Config.DEVICE_ADDRESS,
+                } else if (action.equals(Config.labels.getString("Menu.connect"))) {
+                    if (Config.DEVICE_ADDRESS == null) {
+                        System.out.println("Select device");
+                    } else {
+                        bTDeviceResource.connect(Config.DEVICE_ADDRESS,
                                              Config.DEVICE_TYPE);
-                    connectButton.setText("Reconnect");
-                    deviceButton.setText("Disconnect");
-                } else if (action.equals("Disconnect")) {
+                        connectButton.setText(Config.labels.getString("Menu.reconnect"));
+                        deviceButton.setText(Config.labels.getString("Menu.disconnect"));
+                    }
+                } else if (action.equals(Config.labels.getString("Menu.disconnect"))) {
                     messageResource.stopRead();
-                    connectButton.setText("Connect");
+                    connectButton.setText(Config.labels.getString("Menu.connect"));
                     main.getHeartBeat().stopRead();
-                } else if (action.equals("Reconnect")) {
+                } else if (action.equals(Config.labels.getString("Menu.reconnect"))) {
                     messageResource.stopRead();
                     bTDeviceResource.connect(Config.DEVICE_ADDRESS,
                                              Config.DEVICE_TYPE);
-                } else if (action.equals("Devices")) {
+                } else if (action.equals(Config.labels.getString("Menu.devices"))) {
                     bTDeviceResource.getDevices();
                 }
             }
@@ -103,30 +107,30 @@ public class Menu extends JPanel {
 //        menu2.setBackground(Color.red);
         menuPanel.setPreferredSize(new Dimension(menuSize, 450));
 
-        startStopButton = new JButton("Start");
+        startStopButton = new JButton(Config.labels.getString("Menu.start"));
         startStopButton.setPreferredSize(new Dimension(menuSize, menuSize));
         startStopButton.addActionListener(menuListener);
         menuPanel.add(startStopButton);
 
-        pauseResumeButton = new JButton("Pause");
+        pauseResumeButton = new JButton(Config.labels.getString("Menu.pause"));
         pauseResumeButton.setPreferredSize(
                 new Dimension(menuSize, menuSize / 2));
         pauseResumeButton.addActionListener(menuListener);
         pauseResumeButton.setEnabled(false);
         menuPanel.add(pauseResumeButton);
 
-        statsGraphButton = new JButton("Stats");
+        statsGraphButton = new JButton(Config.labels.getString("Menu.stats"));
         statsGraphButton.setPreferredSize(new Dimension(menuSize, menuSize));
         //statsButton.setEnabled(false);
         statsGraphButton.addActionListener(menuListener);
         menuPanel.add(statsGraphButton);
 
-        connectButton = new JButton("Connect");
+        connectButton = new JButton(Config.labels.getString("Menu.connect"));
         connectButton.setPreferredSize(new Dimension(menuSize, menuSize));
         connectButton.addActionListener(menuListener);
         menuPanel.add(connectButton);
 
-        deviceButton = new JButton("Devices");
+        deviceButton = new JButton(Config.labels.getString("Menu.devices"));
         deviceButton.setPreferredSize(new Dimension(menuSize, menuSize / 2));
         deviceButton.addActionListener(menuListener);
         menuPanel.add(deviceButton);

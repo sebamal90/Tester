@@ -50,22 +50,8 @@ public class DataTable extends JPanel implements Runnable {
         pan.add(table.getTableHeader(), BorderLayout.PAGE_START);
         pan.add(table, BorderLayout.CENTER);
         this.add(pan, BorderLayout.CENTER);
-        /*
-        //scrollPane = new JScrollPane(table);
-        table.setPreferredSize(new Dimension(200, frame.getHeight()-325));
-        table.setFillsViewportHeight(true);
-        add(table);*/
     }
 
-/*
-    @Override
-    public void updateUI() {
-        setUI((BasicPanelUI)UIManager.getUI(this));
-        if (table != null) {
-             table.revalidate();
-        }
-   }
-*/
     public void stop() {
         work = false;
     }

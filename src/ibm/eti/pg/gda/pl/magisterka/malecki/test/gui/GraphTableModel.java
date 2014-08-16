@@ -1,5 +1,6 @@
 package ibm.eti.pg.gda.pl.magisterka.malecki.test.gui;
 
+import ibm.eti.pg.gda.pl.magisterka.malecki.test.core.Config;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 
@@ -39,19 +40,19 @@ public class GraphTableModel extends AbstractTableModel
 
         switch (column) {
         case 0: // '\0'
-            columnName = "Series Name:";
+            columnName = Config.labels.getString("GraphTable.series");
             break;
         case 1: // '\001'
-            columnName = "Time";
+            columnName = Config.labels.getString("GraphTable.time");;
             break;
         case 2: // '\002'
-            columnName = "Value";
+            columnName = Config.labels.getString("GraphTable.value");;
             break;
         case 3: // '\003'
-            columnName = "Avg";
+            columnName = Config.labels.getString("GraphTable.avg");;
             break;
         case 4: // '\004'
-            columnName = "Max";
+            columnName = Config.labels.getString("GraphTable.max");;
             break;
         case 5: // '\005'
             columnName = "X (next):";

@@ -92,7 +92,9 @@ public final class Graph extends JPanel
 
     private JFreeChart createChart() {
         JFreeChart jfreechart = ChartFactory.createTimeSeriesChart(
-                    "Progressive test", "Time", "Hr",
+                    Config.labels.getString("Graph.title"),
+                    Config.labels.getString("Graph.time"),
+                    Config.labels.getString("Graph.hr"),
                     null, true, false, false);
         XYPlot xyplot = (XYPlot) jfreechart.getPlot();
         XYDataset[] axydataset = new XYDataset[SERIES_COUNT];
@@ -100,7 +102,10 @@ public final class Graph extends JPanel
         Minute minute = new Minute(0, hour);
         Second sec = new Second(0, minute);
 
-        String[] seriesName = {"Hr", "Power", "Lactate"};
+        String[] seriesName = {
+            Config.labels.getString("Graph.hr"),
+            Config.labels.getString("Graph.power"),
+            Config.labels.getString("Graph.lactate")};
         for (int i = 0; i < SERIES_COUNT; i++) {
             axydataset[i] = createDataset(i, seriesName[i], sec);
             if (i == 0) {

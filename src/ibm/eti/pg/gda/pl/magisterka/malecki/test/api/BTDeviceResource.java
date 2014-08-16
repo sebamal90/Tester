@@ -23,7 +23,7 @@ public class BTDeviceResource {
 
     public void getDevices() {
         GetDevices gdev = new GetDevices();
-        gdev.setName("Get Devices Thread");
+        gdev.setName("GetDevices Thread");
         gdev.start();
     }
 
