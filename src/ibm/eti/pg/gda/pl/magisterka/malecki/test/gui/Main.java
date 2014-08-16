@@ -19,6 +19,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.HierarchyBoundsListener;
 import java.awt.event.HierarchyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,10 +29,12 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextPane;
+import javax.swing.WindowConstants;
 
 /**
  *
@@ -61,7 +65,7 @@ public class Main {
 
     public Main() throws IOException {
         frame = new JFrame(Config.labels.getString("Main.title"));
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE );
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         //frame.setMinimumSize(new Dimension(800, 600));
 
@@ -89,6 +93,11 @@ public class Main {
             }
         });
 
+        frame.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent evt) {
+              closeWindow();
+            }
+        });
         frame.setVisible(true);
     }
 
@@ -120,6 +129,8 @@ public class Main {
 
         JMenu fileMenu = new JMenu(Config.labels.getString("Main.file"));
         menuBar.add(fileMenu);
+        JMenuItem newItem = fileMenu.add(Config.labels.getString("Main.new"));
+        newItem.addActionListener(menuBarListener);
         JMenuItem propertiesItem = fileMenu.add(Config.labels.getString("Main.properties"));
         propertiesItem.addActionListener(menuBarListener);
         fileMenu.addSeparator();
@@ -191,20 +202,27 @@ public class Main {
     }
 
     public void closeWindow() {
-        monitor.monitorUpdaterStop();
-        if (menu.getDataTable() != null) {
-            menu.getDataTable().stop();
+        int confirm = JOptionPane.showOptionDialog(null,
+                Config.labels.getString("Main.exitConfirm"), null,
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE, null,
+                Config.labels.getString("Main.exitConfirmOpt").split(","), null);
+        if (confirm == 0) {
+            monitor.monitorUpdaterStop();
+            if (menu.getDataTable() != null) {
+                menu.getDataTable().stop();
+            }
+            if (menu.getGraph()  != null) {
+                menu.getGraph().stop();
+            }
+            if (heartBeat != null) {
+                heartBeat.stopRead();
+            }
+            testResource.stopTest();
+            messageResource.stopRead();
+            monitor.monitorUpdaterStop();
+            frame.dispose();
         }
-        if (menu.getGraph()  != null) {
-            menu.getGraph().stop();
-        }
-        if (heartBeat != null) {
-            heartBeat.stopRead();
-        }
-        testResource.stopTest();
-        messageResource.stopRead();
-        monitor.monitorUpdaterStop();
-        frame.dispose();
     }
 
     public void connectionEstabilished() {
