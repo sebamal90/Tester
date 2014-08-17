@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -123,6 +124,8 @@ public class Main {
                 String action = event.getActionCommand();
                 if (action.equals(Config.labels.getString("Main.exit"))) {
                     closeWindow();
+                } else if (action.equals(Config.labels.getString("Main.properties"))) {
+                    Properties prop = new Properties(frame, true);
                 }
             }
         };
