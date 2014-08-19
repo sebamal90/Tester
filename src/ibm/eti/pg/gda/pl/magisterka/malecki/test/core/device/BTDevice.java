@@ -27,11 +27,13 @@ import javax.swing.JDialog;
 public class BTDevice {
     private List<RemoteDevice> devices;
     private final Object inquiryCompletedEvent = new Object();
+    private DiscoveryListener listener;
+    private boolean inquiryStarted = false;
 
-    public List<RemoteDevice> getDevices() {
+    public List<RemoteDevice> findDevices() {
         devices = new ArrayList<RemoteDevice>();
 
-        DiscoveryListener listener = new DiscoveryListener() {
+        listener = new DiscoveryListener() {
             @Override
             public void deviceDiscovered(RemoteDevice btDevice,
                                          DeviceClass cod) {
@@ -49,6 +51,7 @@ public class BTDevice {
             @Override
             public void inquiryCompleted(int discType) {
                 System.out.println("Device Inquiry completed!");
+                inquiryStarted = false;
                 synchronized (inquiryCompletedEvent) {
                     inquiryCompletedEvent.notifyAll();
                 }
@@ -73,13 +76,11 @@ public class BTDevice {
                         .startInquiry(DiscoveryAgent.GIAC, listener);
                 if (started) {
                     System.out.println("wait for device inquiry to complete");
-                    inquiryCompletedEvent.wait();
+                    inquiryStarted = true;
+                    //inquiryCompletedEvent.wait();
                     System.out.println(devices.size() +  " device(s) found");
                 }
             } catch (BluetoothStateException ex) {
-                Logger.getLogger(BTDevice.class.getName())
-                        .log(Level.SEVERE, null, ex);
-            } catch (InterruptedException ex) {
                 Logger.getLogger(BTDevice.class.getName())
                         .log(Level.SEVERE, null, ex);
             }
@@ -87,10 +88,27 @@ public class BTDevice {
         return devices;
     }
 
+    public void stopFindDevices() {
+        try {
+            LocalDevice.getLocalDevice().getDiscoveryAgent().cancelInquiry(listener);
+            System.out.println("Device inquiry canceled");
+        } catch (BluetoothStateException ex) {
+            System.out.println("Can't stop device inquiry");
+        }
+    }
+
+    public List<RemoteDevice> getDevices() {
+        return devices;
+    }
+
+    public boolean isInquiryStarted() {
+        return inquiryStarted;
+    }
+
     public StreamConnection connectByName(String deviceName) {
         StreamConnection results = null;
         if (devices == null) {
-            getDevices();
+            findDevices();
         }
         for (RemoteDevice device : devices) {
             String name;

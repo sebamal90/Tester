@@ -42,6 +42,7 @@ import javax.swing.WindowConstants;
  * @author SebaTab
  */
 public class Main {
+    private static Main main;
 
     private JFrame frame;
     private MessageResource messageResource = new MessageResource();
@@ -61,7 +62,7 @@ public class Main {
     public static void main(String[] args) throws IOException {
         //Config.saveConfig();
         Config.loadConfig();
-        new Main();
+        main = new Main();
     }
 
     public Main() throws IOException {
@@ -125,7 +126,7 @@ public class Main {
                 if (action.equals(Config.labels.getString("Main.exit"))) {
                     closeWindow();
                 } else if (action.equals(Config.labels.getString("Main.properties"))) {
-                    Properties prop = new Properties(frame, true);
+                    Properties prop = new Properties(main, true);
                 }
             }
         };
@@ -202,6 +203,10 @@ public class Main {
 
     public JPanel getPanel() {
         return panel;
+    }
+
+    public JFrame getFrame() {
+        return frame;
     }
 
     public void closeWindow() {

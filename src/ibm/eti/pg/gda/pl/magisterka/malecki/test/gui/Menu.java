@@ -99,7 +99,7 @@ public class Menu extends JPanel {
                     bTDeviceResource.connect(Config.DEVICE_ADDRESS,
                                              Config.DEVICE_TYPE);
                 } else if (action.equals(Config.labels.getString("Menu.devices"))) {
-                    bTDeviceResource.getDevices();
+                    bTDeviceResource.findDevices();
                 }
             }
         };

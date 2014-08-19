@@ -6,7 +6,15 @@ package ibm.eti.pg.gda.pl.magisterka.malecki.test.api;
 
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.core.device.BTDevice;
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.gui.Main;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.util.List;
+import javax.bluetooth.RemoteDevice;
 import javax.microedition.io.StreamConnection;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JProgressBar;
+import javax.swing.WindowConstants;
 
 /**
  *
@@ -16,15 +24,32 @@ public class BTDeviceResource {
 
     private BTDevice btDevice = new BTDevice();
     private final Main main;
+    private GetDevices gdev;
 
     public BTDeviceResource(Main aMain) {
         this.main = aMain;
     }
 
-    public void getDevices() {
-        GetDevices gdev = new GetDevices();
+    public void findDevices() {
+        gdev = new GetDevices();
         gdev.setName("GetDevices Thread");
         gdev.start();
+    }
+
+    public boolean isFindDevicesActive() {
+        return gdev.isAlive();
+    }
+
+    public boolean isInquryStarted() {
+        return btDevice.isInquiryStarted();
+    }
+
+    public void stopFindDevices() {
+        btDevice.stopFindDevices();
+    }
+
+    public List<RemoteDevice> getDevices() {
+        return btDevice.getDevices();
     }
 
     public void connectByFriendlyName(String deviceName,
@@ -92,7 +117,7 @@ public class BTDeviceResource {
     private class GetDevices extends Thread {
         @Override
         public void run() {
-            btDevice.getDevices();
+            btDevice.findDevices();
         }
     }
 }
