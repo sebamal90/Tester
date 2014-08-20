@@ -43,11 +43,12 @@ public final class Config {
             LOCALE = new Locale(prop.getProperty("localeLanguage"),
                                 prop.getProperty("localeCountry"));
 
-            labels = ResourceBundle.getBundle("ibm.eti.pg.gda.pl.magisterka.malecki.test.config.config", LOCALE);
-
 	} catch (IOException ex) {
+            System.out.println("No config file. Start create file");
             createConfig();
 	} finally {
+            labels = ResourceBundle.getBundle("ibm.eti.pg.gda.pl.magisterka.malecki.test.config.config", LOCALE);
+
             if (input != null) {
                 try {
                     input.close();
