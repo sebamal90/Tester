@@ -93,7 +93,9 @@ public class Menu extends JPanel {
                     messageResource.stopRead();
                     connectButton.setText(Config.labels.getString("Menu.connect"));
                     deviceButton.setText(Config.labels.getString("Menu.devices"));
-                    main.getHeartBeat().stopRead();
+                    if (main.getHeartBeat() != null) {
+                        main.getHeartBeat().stopRead();
+                    }
                 } else if (action.equals(Config.labels.getString("Menu.reconnect"))) {
                     messageResource.stopRead();
                     bTDeviceResource.connect(Config.DEVICE_ADDRESS,

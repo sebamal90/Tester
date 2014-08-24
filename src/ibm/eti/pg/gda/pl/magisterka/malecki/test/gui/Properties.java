@@ -9,17 +9,24 @@ import ibm.eti.pg.gda.pl.magisterka.malecki.test.core.Config;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
-import java.util.Locale;
+import java.io.IOException;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.bluetooth.RemoteDevice;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.WindowConstants;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableModel;
 
 /**
  *
@@ -44,6 +51,13 @@ public class Properties extends JDialog {
         main = aMain;
         setLayout(new FlowLayout());
         setPreferredSize(new Dimension(400, 250));
+        setSize(new Dimension(400, 250));
+        final Toolkit toolkit = Toolkit.getDefaultToolkit();
+        final Dimension screenSize = toolkit.getScreenSize();
+        final int x = (screenSize.width - getWidth()) / 2;
+        final int y = (screenSize.height - getHeight()) / 2;
+        setLocation(x, y);
+
         setResizable(false);
 
         add(labLanguage);
@@ -78,7 +92,12 @@ public class Properties extends JDialog {
         setDev.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                getDevices();
+                if (main.getBtdeviceResource().getDevices() == null
+                        || main.getBtdeviceResource().getDevices().size() == 0) {
+                    findDevices();
+                } else {
+                    selectionStart();
+                }
             }
         });
         add(setDev);
@@ -139,24 +158,35 @@ public class Properties extends JDialog {
 
     private void saveProperties() {
         java.util.Properties prop = new java.util.Properties();
-
-        prop.setProperty("deviceAddress", "0022D000F0A7");
-        prop.setProperty("deviceName", "Polar iWL");
+        if (devAddr.getText() != null) {
+            prop.setProperty("deviceAddress", devAddr.getText());
+        }
+        if (devName.getText() != null) {
+            prop.setProperty("deviceName", devName.getText());
+        }
         prop.setProperty("deviceType", "Polar Wear-Link");
         setLanguage(prop);
 
         Config.saveConfig(prop);
     }
 
-    private void getDevices() {
+    private void findDevices() {
+        dial = new JDialog(this, true);
+        dial.setLayout(new FlowLayout());
+        dial.setPreferredSize(new Dimension(450, 150));
+        dial.setSize(new Dimension(450, 150));
+        final Toolkit toolkit = Toolkit.getDefaultToolkit();
+        final Dimension screenSize = toolkit.getScreenSize();
+        final int x = (screenSize.width - dial.getWidth()) / 2;
+        final int y = (screenSize.height - dial.getHeight()) / 2;
+        dial.setLocation(x, y);
+        dial.setResizable(false);
+        dial.setTitle(Config.labels.getString("Properties.searching"));
+
         final JProgressBar aJProgressBar = new JProgressBar();
         aJProgressBar.setIndeterminate(true);
-        dial = new JDialog(this, true);
-        dial.setTitle("Please wait. Searching BT devices....");
-        //aJProgressBar.setMaximumSize(new Dimension(300, 200));
-        aJProgressBar.setPreferredSize(new Dimension(450, 50));
-        //dial.add(new JLabel("Please wait. Searching BT devices...."), BorderLayout.NORTH);
-        dial.add(aJProgressBar, BorderLayout.SOUTH);
+        aJProgressBar.setPreferredSize(new Dimension(420, 60));
+        dial.add(aJProgressBar);
         dial.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         JButton cancel = new JButton(Config.labels.getString("Properties.cancel"));
         cancel.setPreferredSize(new Dimension(100, 30));
@@ -178,6 +208,67 @@ public class Properties extends JDialog {
         dial.setVisible(true);
     }
 
+    private void selectionStart() {
+        final JDialog select = new JDialog(this, true);
+        select.setLayout(new FlowLayout());
+        select.setPreferredSize(new Dimension(450, 200));
+        select.setSize(new Dimension(450, 200));
+        final Toolkit toolkit = Toolkit.getDefaultToolkit();
+        final Dimension screenSize = toolkit.getScreenSize();
+        final int x = (screenSize.width - select.getWidth()) / 2;
+        final int y = (screenSize.height - select.getHeight()) / 2;
+        select.setLocation(x, y);
+        //select.setResizable(false);
+        select.setTitle(Config.labels.getString("Properties.selection"));
+
+        List<RemoteDevice> devices = main.getBtdeviceResource().getDevices();
+        DevicesModel model = new DevicesModel(devices);
+        final JTable jtable = new JTable(model);
+        jtable.getColumnModel().setColumnMargin(10);
+        jtable.getColumnModel().getColumn(0).setMaxWidth(30);
+        JScrollPane jscroll = new JScrollPane(jtable);
+        jscroll.setPreferredSize(new Dimension(440, 100));
+        select.add(jscroll);
+
+        JButton setDev = new JButton(Config.labels.getString("Properties.deviceSelect"));
+        setDev.setPreferredSize(new Dimension(150, 30));
+        setDev.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int row = jtable.getSelectedRow();
+                devName.setText((String) jtable.getValueAt(row, 1));
+                devAddr.setText((String) jtable.getValueAt(row, 2));
+                select.dispose();
+            }
+        });
+        select.add(setDev);
+
+        JButton findtDev = new JButton(Config.labels.getString("Properties.deviceFindAgain"));
+        findtDev.setPreferredSize(new Dimension(150, 30));
+        findtDev.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                select.dispose();
+                findDevices();
+            }
+        });
+        select.add(findtDev);
+
+        JButton cancel = new JButton(Config.labels.getString("Properties.cancel"));
+        cancel.setPreferredSize(new Dimension(100, 30));
+        cancel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                select.dispose();
+            }
+        });
+        select.add(cancel);
+
+
+        //select.pack();
+        select.setVisible(true);
+    }
+
     private void findFinshed() {
         //System.out.println("Found " + main.getBtdeviceResource().getDevices().size());
         //main.getBtdeviceResource().stopFindDevices();
@@ -192,12 +283,14 @@ public class Properties extends JDialog {
             while(work) {
                 if (!main.getBtdeviceResource().isFindDevicesActive()
                         && !main.getBtdeviceResource().isInquryStarted()) {
-                    //findFinshed();
                     break;
                 }
             }
             System.out.println("Found " + main.getBtdeviceResource().getDevices().size());
             dial.dispose();
+            if (work) {
+                selectionStart();
+            }
         }
 
         public void stopListen() {
@@ -208,5 +301,57 @@ public class Properties extends JDialog {
 
 
 
+    private class DevicesModel extends AbstractTableModel
+                                implements TableModel {
+        private List<RemoteDevice> devices;
 
+        public DevicesModel(List<RemoteDevice> aDevices) {
+            super();
+            devices = aDevices;
+        }
+
+        @Override
+        public int getRowCount() {
+            return devices.size();
+        }
+
+        @Override
+        public int getColumnCount() {
+            return 3;
+        }
+
+        @Override
+        public Object getValueAt(int rowIndex, int columnIndex) {
+                RemoteDevice device = devices.get(rowIndex);
+            Object value = null;
+            switch(columnIndex) {
+                case 0:
+                    value = rowIndex + 1;
+                    break;
+                case 1:
+                    try {
+                        value = device.getFriendlyName(false);
+                    } catch (IOException ex) {
+                        value = "Not available";
+                    }
+                    break;
+                case 2:
+                    value = device.getBluetoothAddress();
+                default:
+                    break;
+            }
+            return value;
+        }
+
+        @Override
+        public boolean isCellEditable(int rowIndex, int columnIndex) {
+            return false;
+        }
+
+        @Override
+        public String getColumnName(int columnIndex) {
+            String[] columns = new String[]{"Lp", "Device name", "Device address"};
+            return columns[columnIndex];
+        }
+    }
 }
