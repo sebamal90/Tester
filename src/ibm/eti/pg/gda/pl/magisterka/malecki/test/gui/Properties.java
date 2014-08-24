@@ -6,7 +6,6 @@
 package ibm.eti.pg.gda.pl.magisterka.malecki.test.gui;
 
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.core.Config;
-import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Toolkit;
@@ -14,8 +13,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.bluetooth.RemoteDevice;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -46,7 +43,7 @@ public class Properties extends JDialog {
     private JDialog dial;
     private DeviceSearchingListener devList;
 
-    public Properties(Main aMain, boolean modal){
+    public Properties(Main aMain, boolean modal) {
         super(aMain.getFrame(), modal);
         main = aMain;
         setLayout(new FlowLayout());
@@ -280,7 +277,7 @@ public class Properties extends JDialog {
         private boolean work = true;
         @Override
         public void run() {
-            while(work) {
+            while (work) {
                 if (!main.getBtdeviceResource().isFindDevicesActive()
                         && !main.getBtdeviceResource().isInquryStarted()) {
                     break;

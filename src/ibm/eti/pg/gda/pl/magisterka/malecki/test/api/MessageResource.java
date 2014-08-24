@@ -6,7 +6,6 @@ package ibm.eti.pg.gda.pl.magisterka.malecki.test.api;
 
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.core.device.Message;
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.core.device.MessageReader;
-import ibm.eti.pg.gda.pl.magisterka.malecki.test.gui.Main;
 import javax.microedition.io.StreamConnection;
 
 /**

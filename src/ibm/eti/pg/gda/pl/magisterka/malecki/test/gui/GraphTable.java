@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package ibm.eti.pg.gda.pl.magisterka.malecki.test.gui;
 
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.core.Config;
@@ -22,7 +17,7 @@ import org.jfree.ui.NumberCellRenderer;
  *
  * @author SebaTab
  */
-public class GraphTable extends JPanel{
+public class GraphTable extends JPanel {
     private final GraphTableModel model;
     private static final int SERIES_COUNT = 1;
 

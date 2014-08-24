@@ -6,15 +6,9 @@ package ibm.eti.pg.gda.pl.magisterka.malecki.test.api;
 
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.core.device.BTDevice;
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.gui.Main;
-import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.util.List;
 import javax.bluetooth.RemoteDevice;
 import javax.microedition.io.StreamConnection;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JProgressBar;
-import javax.swing.WindowConstants;
 
 /**
  *

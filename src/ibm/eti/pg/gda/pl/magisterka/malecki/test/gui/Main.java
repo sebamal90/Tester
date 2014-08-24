@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -43,7 +42,6 @@ import javax.swing.WindowConstants;
  */
 public class Main {
     private static Main main;
-
     private JFrame frame;
     private MessageResource messageResource = new MessageResource();
     private BTDeviceResource btdeviceResource = new BTDeviceResource(this);
@@ -67,7 +65,7 @@ public class Main {
 
     public Main() throws IOException {
         frame = new JFrame(Config.labels.getString("Main.title"));
-        frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE );
+        frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         //frame.setMinimumSize(new Dimension(800, 600));
 
@@ -96,8 +94,9 @@ public class Main {
         });
 
         frame.addWindowListener(new WindowAdapter() {
+            @Override
             public void windowClosing(WindowEvent evt) {
-              closeWindow();
+              closeApp();
             }
         });
         frame.setVisible(true);
@@ -124,9 +123,9 @@ public class Main {
             public void actionPerformed(ActionEvent event) {
                 String action = event.getActionCommand();
                 if (action.equals(Config.labels.getString("Main.exit"))) {
-                    closeWindow();
+                    closeApp();
                 } else if (action.equals(Config.labels.getString("Main.properties"))) {
-                    Properties prop = new Properties(main, true);
+                    new Properties(main, true);
                 }
             }
         };
@@ -140,7 +139,6 @@ public class Main {
         fileMenu.addSeparator();
         JMenuItem exitItem = fileMenu.add(Config.labels.getString("Main.exit"));
         exitItem.addActionListener(menuBarListener);
-
     }
 
     private void addMenu() {
@@ -209,7 +207,7 @@ public class Main {
         return frame;
     }
 
-    public void closeWindow() {
+    public void closeApp() {
         int confirm = JOptionPane.showOptionDialog(null,
                 Config.labels.getString("Main.exitConfirm"), null,
                 JOptionPane.YES_NO_OPTION,

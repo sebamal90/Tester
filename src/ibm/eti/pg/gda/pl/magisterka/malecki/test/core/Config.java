@@ -26,11 +26,13 @@ public final class Config {
     private static final String CONFIG_DIR = "config.properties";
     public static ResourceBundle labels;
 
+    private Config() { }
+
     public static void loadConfig() {
         Properties prop = new Properties();
-	InputStream input = null;
+        InputStream input = null;
 
-	try {
+        try {
 
             input = new FileInputStream(CONFIG_DIR);
 

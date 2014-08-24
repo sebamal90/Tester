@@ -18,7 +18,6 @@ import javax.bluetooth.RemoteDevice;
 import javax.bluetooth.ServiceRecord;
 import javax.microedition.io.Connector;
 import javax.microedition.io.StreamConnection;
-import javax.swing.JDialog;
 
 /**
  *

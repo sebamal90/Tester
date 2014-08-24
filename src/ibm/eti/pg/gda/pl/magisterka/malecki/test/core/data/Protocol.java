@@ -22,6 +22,6 @@ public class Protocol {
     }
 
     public void loadProtocol() {
-
+        //not implemented yet
     }
 }

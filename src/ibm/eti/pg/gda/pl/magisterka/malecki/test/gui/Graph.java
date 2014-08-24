@@ -7,17 +7,13 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.ChartUtilities;
@@ -41,8 +37,6 @@ import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.time.TimeSeriesDataItem;
 import org.jfree.data.xy.XYDataset;
-import org.jfree.ui.DateCellRenderer;
-import org.jfree.ui.NumberCellRenderer;
 
 /**
  *
@@ -88,7 +82,7 @@ public final class Graph extends JPanel
 
     @Override
     public void chartChanged(ChartChangeEvent chartchangeevent) {
-
+        //not used
     }
 
     private JFreeChart createChart() {
@@ -161,7 +155,7 @@ public final class Graph extends JPanel
                 for (int i = 0; i < SERIES_COUNT; i++) {
                     long lowerBound = series[i].getDataItem(0)
                             .getPeriod().getFirstMillisecond();
-                    long upperBound = series[i].getDataItem(series[i].getItemCount()-1)
+                    long upperBound = series[i].getDataItem(series[i].getItemCount() - 1)
                             .getPeriod().getFirstMillisecond();
                     if (l < lowerBound) {
                         l = lowerBound;
@@ -194,7 +188,7 @@ public final class Graph extends JPanel
                         timeseriesdataitem1 = series[i].getDataItem(ai[1]);
                     } else {
                         timeseriesdataitem1 = series[i].getDataItem(
-                                series[i].getItemCount()-1);
+                                series[i].getItemCount() - 1);
                     }
                     l2 = timeseriesdataitem1.getPeriod().getFirstMillisecond();
                     d2 = (double) timeseriesdataitem1.getValue();
@@ -256,7 +250,6 @@ public final class Graph extends JPanel
     public void run() {
 
         TestResource testResource = main.getTestResource();
-        String lastTime = "0:0";
 
         while (work) {
             try {
@@ -267,24 +260,6 @@ public final class Graph extends JPanel
             }
 
             if (testResource.isTestStatus()) {
-                /*long time = testResource.getTime();
-                int sec = (int) (TimeUnit.MILLISECONDS.toSeconds(time)
-                        - TimeUnit.MINUTES.toSeconds(
-                          TimeUnit.MILLISECONDS.toMinutes(time)));
-
-                int min = (int) TimeUnit.MILLISECONDS.toMinutes(time);
-
-                if (!lastTime.equals(min + ":" + sec)) {
-                    lastTime = min + ":" + sec;
-
-                    Hour hour = new Hour(0, new Day());
-                    Minute minute = new Minute(min, hour);
-                    Second second = new Second(sec, minute);
-                    RegularTimePeriod regulartime = second;
-
-                    series[0].add(regulartime, main.getHeartBeat().getHR());
-                }*/
-
                 List<DataSaver.HrData> dataList = testResource.getDatas();
                 for (int i = 0; i < dataList.size(); i++) {
                     long time = dataList.get(i).getTime();

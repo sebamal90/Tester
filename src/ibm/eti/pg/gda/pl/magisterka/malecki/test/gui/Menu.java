@@ -51,7 +51,7 @@ public class Menu extends JPanel {
                         pauseResumeButton.setEnabled(true);
                     }
                 } else if (action.equals(Config.labels.getString("Menu.end"))) {
-                    main.closeWindow();
+                    main.closeApp();
                 } else if (action.equals(Config.labels.getString("Menu.pause"))) {
                     testResource.pauseTest();
                     pauseResumeButton.setText(Config.labels.getString("Menu.resume"));

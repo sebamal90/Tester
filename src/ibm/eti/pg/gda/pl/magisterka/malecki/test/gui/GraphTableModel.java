@@ -43,16 +43,16 @@ public class GraphTableModel extends AbstractTableModel
             columnName = Config.labels.getString("GraphTable.series");
             break;
         case 1: // '\001'
-            columnName = Config.labels.getString("GraphTable.time");;
+            columnName = Config.labels.getString("GraphTable.time");
             break;
         case 2: // '\002'
-            columnName = Config.labels.getString("GraphTable.value");;
+            columnName = Config.labels.getString("GraphTable.value");
             break;
         case 3: // '\003'
-            columnName = Config.labels.getString("GraphTable.avg");;
+            columnName = Config.labels.getString("GraphTable.avg");
             break;
         case 4: // '\004'
-            columnName = Config.labels.getString("GraphTable.max");;
+            columnName = Config.labels.getString("GraphTable.max");
             break;
         case 5: // '\005'
             columnName = "X (next):";
