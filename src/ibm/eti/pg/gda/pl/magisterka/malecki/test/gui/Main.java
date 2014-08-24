@@ -233,10 +233,15 @@ public class Main {
 
     public void connectionEstabilished() {
         System.out.println("Connection estabilished");
+        menu.connectionEstabilished();
         heartBeat = new HeartBeat();
         Thread thread = new Thread((Runnable) heartBeat);
         thread.setName("Heart Beat Thread");
         thread.start();
+    }
+
+    public void connectionFailure() {
+        menu.connectionFailure();
     }
 
     public HeartBeat getHeartBeat() {

@@ -22,7 +22,7 @@ public class Menu extends JPanel {
     private JButton startStopButton;
     private JButton pauseResumeButton;
     private JButton connectButton;
-    private JButton deviceButton;
+    private JButton disconnectButton;
     private JSeparator menuSeparator;
     private JPanel menuPanel;
     private final Main main;
@@ -86,13 +86,12 @@ public class Menu extends JPanel {
                     } else {
                         bTDeviceResource.connect(Config.DEVICE_ADDRESS,
                                              Config.DEVICE_TYPE);
-                        connectButton.setText(Config.labels.getString("Menu.reconnect"));
-                        deviceButton.setText(Config.labels.getString("Menu.disconnect"));
+                        connectButton.setEnabled(false);
                     }
                 } else if (action.equals(Config.labels.getString("Menu.disconnect"))) {
                     messageResource.stopRead();
                     connectButton.setText(Config.labels.getString("Menu.connect"));
-                    deviceButton.setText(Config.labels.getString("Menu.devices"));
+                    disconnectButton.setEnabled(false);
                     if (main.getHeartBeat() != null) {
                         main.getHeartBeat().stopRead();
                     }
@@ -100,8 +99,6 @@ public class Menu extends JPanel {
                     messageResource.stopRead();
                     bTDeviceResource.connect(Config.DEVICE_ADDRESS,
                                              Config.DEVICE_TYPE);
-                } else if (action.equals(Config.labels.getString("Menu.devices"))) {
-                    bTDeviceResource.findDevices();
                 }
             }
         };
@@ -124,7 +121,6 @@ public class Menu extends JPanel {
 
         statsGraphButton = new JButton(Config.labels.getString("Menu.stats"));
         statsGraphButton.setPreferredSize(new Dimension(menuSize, menuSize));
-        //statsButton.setEnabled(false);
         statsGraphButton.addActionListener(menuListener);
         menuPanel.add(statsGraphButton);
 
@@ -133,10 +129,11 @@ public class Menu extends JPanel {
         connectButton.addActionListener(menuListener);
         menuPanel.add(connectButton);
 
-        deviceButton = new JButton(Config.labels.getString("Menu.devices"));
-        deviceButton.setPreferredSize(new Dimension(menuSize, menuSize / 2));
-        deviceButton.addActionListener(menuListener);
-        menuPanel.add(deviceButton);
+        disconnectButton = new JButton(Config.labels.getString("Menu.disconnect"));
+        disconnectButton.setPreferredSize(new Dimension(menuSize, menuSize / 2));
+        disconnectButton.addActionListener(menuListener);
+        disconnectButton.setEnabled(false);
+        menuPanel.add(disconnectButton);
 
         add(menuPanel);
 
@@ -165,5 +162,15 @@ public class Menu extends JPanel {
 
     public Graph getGraph() {
         return graph;
+    }
+
+    public void connectionEstabilished() {
+        connectButton.setText(Config.labels.getString("Menu.reconnect"));
+        disconnectButton.setEnabled(true);
+        connectButton.setEnabled(true);
+    }
+
+    public void connectionFailure() {
+        connectButton.setEnabled(true);
     }
 }

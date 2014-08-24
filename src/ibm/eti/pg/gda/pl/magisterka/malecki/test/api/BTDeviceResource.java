@@ -77,9 +77,10 @@ public class BTDeviceResource {
         public void run() {
             StreamConnection connection =
                     btDevice.connectByName(deviceName);
-            if (connection != null) {
-                main.getMessageResource().startRead(connection, deviceType);
-                main.connectionEstabilished();
+            if (connection == null) {
+                connectedFail();
+            } else {
+                connected(connection, deviceType);
             }
         }
     }
@@ -101,9 +102,10 @@ public class BTDeviceResource {
         @Override
         public void run() {
             StreamConnection connection = btDevice.connect(deviceAddress);
-            if (connection != null) {
-                main.getMessageResource().startRead(connection, deviceType);
-                main.connectionEstabilished();
+            if (connection == null) {
+                connectedFail();
+            } else {
+                connected(connection, deviceType);
             }
         }
     }
@@ -113,5 +115,14 @@ public class BTDeviceResource {
         public void run() {
             btDevice.findDevices();
         }
+    }
+
+    private void connected(StreamConnection connection, String deviceType) {
+        main.getMessageResource().startRead(connection, deviceType);
+        main.connectionEstabilished();
+    }
+
+    private void connectedFail() {
+        main.connectionFailure();
     }
 }
