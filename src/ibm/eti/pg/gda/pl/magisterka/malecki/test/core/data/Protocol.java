@@ -24,4 +24,60 @@ public class Protocol {
     public void loadProtocol() {
         //not implemented yet
     }
+
+    public int getWaitTime() {
+        return waitTime;
+    }
+
+    public int getWarmupTime() {
+        return warmupTime;
+    }
+
+    public int getStepTime() {
+        return stepTime;
+    }
+
+    public int getStartPower() {
+        return startPower;
+    }
+
+    public int getStepPower() {
+        return stepPower;
+    }
+
+    public int getRpm() {
+        return rpm;
+    }
+
+    public int getRecovery() {
+        return recovery;
+    }
+
+    public void setWaitTime(int waitTime) {
+        this.waitTime = waitTime;
+    }
+
+    public void setWarmupTime(int warmupTime) {
+        this.warmupTime = warmupTime;
+    }
+
+    public void setStepTime(int stepTime) {
+        this.stepTime = stepTime;
+    }
+
+    public void setStartPower(int startPower) {
+        this.startPower = startPower;
+    }
+
+    public void setStepPower(int stepPower) {
+        this.stepPower = stepPower;
+    }
+
+    public void setRpm(int rpm) {
+        this.rpm = rpm;
+    }
+
+    public void setRecovery(int recovery) {
+        this.recovery = recovery;
+    }
 }

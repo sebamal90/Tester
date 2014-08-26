@@ -1,50 +1,41 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package ibm.eti.pg.gda.pl.magisterka.malecki.test.api;
 
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.core.data.DataSaver;
+import ibm.eti.pg.gda.pl.magisterka.malecki.test.core.data.DataSaver.TestData;
+import ibm.eti.pg.gda.pl.magisterka.malecki.test.core.data.TestController;
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.gui.Main;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-/**
- *
- * @author SebaTab
- */
 public class TestResource {
     private final Main main;
-    private DataSaver dataSaver;
+    private TestController testController;
     private boolean testStatus = false;
-    private String phase;
 
     public TestResource(Main aMain) {
         this.main = aMain;
+        testController = new TestController(main);
+        testController.setName("TestController Thread");
     }
 
     public void startTest() {
-        dataSaver = new DataSaver(main);
-        dataSaver.setName("Data Saver Thread");
-        dataSaver.start();
+        testController.start();
         testStatus = true;
     }
 
     public void pauseTest() {
-        dataSaver.pauseDataSaver();
+        testController.pauseTest();
         testStatus = false;
     }
 
     public void resumeTest() {
-        dataSaver.resumeDataSaver();
+        testController.pauseTest();
         testStatus = true;
     }
 
     public void stopTest() {
-        if (dataSaver != null) {
-            dataSaver.stopDataSaver();
-        }
+        testController.stopTest();
         testStatus = false;
     }
 
@@ -53,11 +44,11 @@ public class TestResource {
     }
 
     public long getTime() {
-        return dataSaver.getTime();
+        return testController.getTime();
     }
 
     public String getTimer() {
-        long time = dataSaver.getTime();
+        long time = testController.getTime();
         int sec = (int) (TimeUnit.MILLISECONDS.toSeconds(time)
                 - TimeUnit.MINUTES.toSeconds(
                   TimeUnit.MILLISECONDS.toMinutes(time)));
@@ -71,15 +62,7 @@ public class TestResource {
         return timer;
     }
 
-    public List<DataSaver.HrData> getDatas()  {
-        List<DataSaver.HrData> dataList;
-
-        if (dataSaver == null) {
-            dataList = new ArrayList<DataSaver.HrData>();
-        } else {
-            dataList = dataSaver.getHrData();
-        }
-
-        return dataList;
+    public List<TestData> getDatas()  {
+        return testController.getTestDatas();
     }
 }

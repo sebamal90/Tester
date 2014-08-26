@@ -19,7 +19,7 @@ import org.jfree.ui.NumberCellRenderer;
  */
 public class GraphTable extends JPanel {
     private final GraphTableModel model;
-    private static final int SERIES_COUNT = 1;
+    private static final int SERIES_COUNT = 2;
 
     public GraphTable(JFreeChart jfreechart) {
         super(new BorderLayout());

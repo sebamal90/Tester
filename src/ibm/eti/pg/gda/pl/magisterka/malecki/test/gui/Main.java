@@ -47,7 +47,6 @@ public class Main {
     private BTDeviceResource btdeviceResource = new BTDeviceResource(this);
     private TestResource testResource = new TestResource(this);
     private JTextPane logger = new javax.swing.JTextPane();
-    private HeartBeat heartBeat;
     private Monitor monitor;
     private JPanel panel;
     private Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
@@ -164,7 +163,7 @@ public class Main {
         JPanel worker = new JPanel();
         frame.add(worker, BorderLayout.CENTER);
 //        worker.setBackground(Color.GRAY);
-        monitor = new Monitor(testResource);
+        monitor = new Monitor(testResource, messageResource);
         monitor.setPreferredSize(
                 new Dimension((int) dim.getWidth() - 115, 100));
         monitor.monitorUpdaterStart();
@@ -207,6 +206,10 @@ public class Main {
         return frame;
     }
 
+    public Monitor getMonitor() {
+        return monitor;
+    }
+
     public void closeApp() {
         int confirm = JOptionPane.showOptionDialog(null,
                 Config.labels.getString("Main.exitConfirm"), null,
@@ -221,9 +224,6 @@ public class Main {
             if (menu.getGraph()  != null) {
                 menu.getGraph().stop();
             }
-            if (heartBeat != null) {
-                heartBeat.stopRead();
-            }
             testResource.stopTest();
             messageResource.stopRead();
             monitor.monitorUpdaterStop();
@@ -234,90 +234,10 @@ public class Main {
     public void connectionEstabilished() {
         System.out.println("Connection estabilished");
         menu.connectionEstabilished();
-        heartBeat = new HeartBeat();
-        Thread thread = new Thread((Runnable) heartBeat);
-        thread.setName("Heart Beat Thread");
-        thread.start();
+        monitor.startBeat();
     }
 
     public void connectionFailure() {
         menu.connectionFailure();
-    }
-
-    public HeartBeat getHeartBeat() {
-        return heartBeat;
-    }
-
-    public class HeartBeat implements Runnable {
-        private int heartRate;
-        private Message lastMessage;
-        private boolean read = true;
-
-        public HeartBeat() {
-            heartRate = 0;
-            lastMessage = new Message();
-            lastMessage.setTime(System.currentTimeMillis());
-            lastMessage.setHr(0);
-        }
-        @Override
-        public void run() {
-            while (read) {
-                setHR();
-                if (heartRate != 0) {
-                    int sleep = 1000 / heartRate;
-
-                    try {
-                        Thread.sleep(40 * sleep);
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(Main.class.getName()).
-                                log(Level.SEVERE, null, ex);
-                    }
-
-                    monitor.beat(1);
-
-                    try {
-                        Thread.sleep(20 * sleep);
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(Main.class.getName()).
-                                log(Level.SEVERE, null, ex);
-                    }
-
-                    monitor.beat(0);
-                } else {
-                    try {
-                        Thread.sleep(2000);
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(Main.class.getName()).
-                                log(Level.SEVERE, null, ex);
-                    }
-                }
-            }
-        }
-
-        public void setHR() {
-            Message message = messageResource.getLastMessage();
-
-            if (message != null) {
-                if (message.getTime() == lastMessage.getTime()
-                    && System.currentTimeMillis()
-                        - lastMessage.getTime() > 3000) {
-                    monitor.setHeartRate(heartRate + "!");
-                } else {
-                    lastMessage = message;
-                    heartRate = lastMessage.getHr();
-                    monitor.setHeartRate(String.valueOf(heartRate));
-                }
-            }
-        }
-
-        public void stopRead() {
-            read = false;
-            heartRate = 0;
-
-        }
-
-        public int getHR() {
-            return heartRate;
-        }
     }
 }

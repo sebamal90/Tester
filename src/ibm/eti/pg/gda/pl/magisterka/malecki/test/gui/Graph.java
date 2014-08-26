@@ -3,6 +3,7 @@ package ibm.eti.pg.gda.pl.magisterka.malecki.test.gui;
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.api.TestResource;
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.core.Config;
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.core.data.DataSaver;
+import ibm.eti.pg.gda.pl.magisterka.malecki.test.core.data.DataSaver.TestData;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -45,7 +46,7 @@ import org.jfree.data.xy.XYDataset;
 public final class Graph extends JPanel
     implements ChartChangeListener, ChartProgressListener, Runnable {
 
-    private static final int SERIES_COUNT = 1;
+    private static final int SERIES_COUNT = 2;
     private TimeSeriesCollection[] datasets;
     private TimeSeries[] series;
     private ChartPanel chartPanel;
@@ -260,7 +261,7 @@ public final class Graph extends JPanel
             }
 
             if (testResource.isTestStatus()) {
-                List<DataSaver.HrData> dataList = testResource.getDatas();
+                List<TestData> dataList = testResource.getDatas();
                 for (int i = 0; i < dataList.size(); i++) {
                     long time = dataList.get(i).getTime();
                     int sec = (int) (TimeUnit.MILLISECONDS.toSeconds(time)
@@ -280,7 +281,9 @@ public final class Graph extends JPanel
                         series[0].clear();
                     }
                     series[0].addOrUpdate(regulartime,
-                                          dataList.get(i).getHr());
+                                          dataList.get(i).getHeartRate());
+                    series[1].addOrUpdate(regulartime,
+                                          dataList.get(i).getLoad());
                 }
             }
         }

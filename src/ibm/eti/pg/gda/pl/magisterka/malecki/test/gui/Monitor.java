@@ -4,8 +4,10 @@
  */
 package ibm.eti.pg.gda.pl.magisterka.malecki.test.gui;
 
+import ibm.eti.pg.gda.pl.magisterka.malecki.test.api.MessageResource;
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.api.TestResource;
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.core.Config;
+import ibm.eti.pg.gda.pl.magisterka.malecki.test.core.device.Message;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Image;
@@ -36,10 +38,14 @@ public class Monitor extends JPanel {
     private final JLabel clockLabel;
     private final TestResource testResource;
     private boolean work;
+    private final MessageResource messageResource;
+    private HeartBeat heartBeat;
 
-    public Monitor(TestResource aTestResource) throws IOException {
+    public Monitor(TestResource aTestResource,
+            MessageResource aMessageResource) throws IOException {
         super();
         this.testResource = aTestResource;
+        this.messageResource = aMessageResource;
         setLayout(new FlowLayout(FlowLayout.LEFT));
         setBorder(BorderFactory.createEmptyBorder(-5, 5, 0, 0));
 
@@ -118,6 +124,16 @@ public class Monitor extends JPanel {
         heartRate.setText(hrString);
     }
 
+    public void startBeat() {
+        heartBeat = new HeartBeat();
+        heartBeat.setName("Heart Beat Thread");
+        heartBeat.start();
+    }
+
+    public void stopBeat() {
+        heartBeat.stopBeat();
+    }
+
     private class MonitorUpdater extends Thread {
         private SimpleDateFormat dateFormat =
                 new SimpleDateFormat("HH:mm", Config.LOCALE);
@@ -133,6 +149,12 @@ public class Monitor extends JPanel {
             int tmpCount = 0;
             while (work) {
                 clockLabel.setText(dateFormat.format(new Date()));
+                if (messageResource.isReading()) {
+                    heartRate.setText(String.valueOf(messageResource.getHR()));
+                    if (!messageResource.isHRTimeValid()) {
+                        heartRate.setText(heartRate.getText() + "!");
+                    }
+                }
                 if (testResource.isTestStatus()) {
                     timeLabel.setText(testResource.getTimer());
                     powerLabel.setText(tmpCount + "W");
@@ -148,5 +170,50 @@ public class Monitor extends JPanel {
             }
         }
 
+    }
+
+    public class HeartBeat extends Thread {
+        private int heartRate;
+        private boolean beatWork = true;
+
+        @Override
+        public void run() {
+            while (beatWork) {
+                heartRate = messageResource.getHR();
+                if (heartRate != 0) {
+                    int sleep = 1000 / heartRate;
+
+                    try {
+                        Thread.sleep(40 * sleep);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(Main.class.getName()).
+                                log(Level.SEVERE, null, ex);
+                    }
+
+                    beat(1);
+
+                    try {
+                        Thread.sleep(20 * sleep);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(Main.class.getName()).
+                                log(Level.SEVERE, null, ex);
+                    }
+
+                    beat(0);
+                } else {
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(Main.class.getName()).
+                                log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        }
+
+        public void stopBeat() {
+            beatWork = false;
+            heartRate = 0;
+        }
     }
 }

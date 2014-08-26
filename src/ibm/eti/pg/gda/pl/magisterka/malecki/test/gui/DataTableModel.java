@@ -4,7 +4,7 @@
  */
 package ibm.eti.pg.gda.pl.magisterka.malecki.test.gui;
 
-import ibm.eti.pg.gda.pl.magisterka.malecki.test.core.data.DataSaver.HrData;
+import ibm.eti.pg.gda.pl.magisterka.malecki.test.core.data.DataSaver.TestData;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import javax.swing.table.AbstractTableModel;
@@ -15,16 +15,16 @@ import javax.swing.table.AbstractTableModel;
  */
 public class DataTableModel extends AbstractTableModel {
 
-    private List<HrData> datas;
+    private List<TestData> datas;
     private String[] columns;
 
-    public DataTableModel(List<HrData> aDatas) {
+    public DataTableModel(List<TestData> aDatas) {
         super();
         this.datas = aDatas;
         columns = new String[]{"Time", "Hr"};
     }
 
-    public void setDataTableModel(List<HrData> aDatas) {
+    public void setDataTableModel(List<TestData> aDatas) {
         this.datas = aDatas;
     }
 
@@ -40,14 +40,14 @@ public class DataTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        HrData data = datas.get(rowIndex);
+        TestData data = datas.get(rowIndex);
         Object value = null;
         switch(columnIndex) {
             case 0:
                 value = convert(data.getTime());
                 break;
             case 1:
-                value = data.getHr();
+                value = data.getHeartRate();
                 break;
             default:
                 break;
@@ -58,7 +58,7 @@ public class DataTableModel extends AbstractTableModel {
 
     @Override
     public void setValueAt(Object value, int rowIndex, int columnIndex) {
-        HrData data = datas.get(rowIndex);
+        TestData data = datas.get(rowIndex);
         String oldValue = "";
         String newValue = "";
         switch(columnIndex) {
@@ -68,9 +68,9 @@ public class DataTableModel extends AbstractTableModel {
                 newValue = String.valueOf(data.getTime());
                 break;
             case 1:
-                oldValue = String.valueOf(data.getHr());
-                data.setHr(Integer.parseInt((String) value));
-                newValue = String.valueOf(data.getHr());
+                oldValue = String.valueOf(data.getHeartRate());
+                data.setHeartRate(Integer.parseInt((String) value));
+                newValue = String.valueOf(data.getHeartRate());
                 break;
             default:
                 break;

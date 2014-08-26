@@ -43,7 +43,7 @@ public class Menu extends JPanel {
             public void actionPerformed(ActionEvent event) {
                 String action = event.getActionCommand();
                 if (action.equals(Config.labels.getString("Menu.start"))) {
-                    if (main.getHeartBeat() == null) {
+                    if (!main.getMessageResource().isReading()) {
                         System.out.println("Don't connected with hr Listener");
                     } else {
                         testResource.startTest();
@@ -92,9 +92,8 @@ public class Menu extends JPanel {
                     messageResource.stopRead();
                     connectButton.setText(Config.labels.getString("Menu.connect"));
                     disconnectButton.setEnabled(false);
-                    if (main.getHeartBeat() != null) {
-                        main.getHeartBeat().stopRead();
-                    }
+                    main.getMonitor().stopBeat();
+
                 } else if (action.equals(Config.labels.getString("Menu.reconnect"))) {
                     messageResource.stopRead();
                     bTDeviceResource.connect(Config.DEVICE_ADDRESS,

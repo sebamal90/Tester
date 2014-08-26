@@ -15,119 +15,49 @@ import java.util.logging.Logger;
  * @author SebaTab
  */
 public class DataSaver extends Thread {
-    private long startTime;
-    private final Main main;
-    private List<HrData> hrData;
-    private boolean work = true;
-    private boolean pause = false;
-    private long pauseStart;
-    private long pauseTime = 0;
 
-    public DataSaver(Main aMain) {
+    private List<TestData> testDatas;
+
+
+    public DataSaver() {
         super();
-        this.main = aMain;
-        hrData = new ArrayList<HrData>();
+        testDatas = new ArrayList<TestData>();
     }
 
-    @Override
-    public void run() {
-        startTime = System.currentTimeMillis();
-        long lastTime = startTime;
-        hrData.add(new HrData(0, main.getHeartBeat().getHR()));
-       // hrData.add(new HrData(0, 59));
-       // System.out.println("Saved time:"
-            //+ hrData.get(hrData.size()-1).getTime()
-       //   + "hr: " + hrData.get(hrData.size()-1).getHr());
-
-        while (work) {
-            long now = System.currentTimeMillis();
-            if (now - lastTime >= 2000) {
-                hrData.add(new HrData(now - startTime - pauseTime,
-                        main.getHeartBeat().getHR()));
-                //hrData.add(new HrData(now-startTime-pauseTime, 59));
-                //System.out.println("Saved time:"
-                            //+ hrData.get(hrData.size()-1).getTime()
-                            //+ "hr: " + hrData.get(hrData.size()-1).getHr());
-                lastTime = now;
-            }
-
-            while (pause) {
-               try {
-                  Thread.sleep(500);
-               } catch (InterruptedException ex) {
-                   Logger.getLogger(DataSaver.class.getName()).
-                           log(Level.SEVERE, null, ex);
-               }
-            }
-
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(DataSaver.class.getName()).
-                        log(Level.SEVERE, null, ex);
-            }
-        }
+    public void addData(long time, int hr) {
+        testDatas.add(new TestData(time, hr));
     }
 
-    public long getTime() {
-        long time = 0;
-        if (startTime != 0) {
-            time = System.currentTimeMillis() - startTime - pauseTime;
-        }
-        return time;
+    public void addData(long time, int hr, int load) {
+         testDatas.add(new TestData(time, hr, load));
     }
 
-    public List<HrData> getHrData() {
-        return hrData;
+    public List<TestData> getTestDatas() {
+        return testDatas;
     }
 
-    public void resumeDataSaver() {
-        work = true;
-        pause = false;
-        pauseTime = pauseTime + (System.currentTimeMillis() - pauseStart);
-    }
-
-    public void pauseDataSaver() {
-        work = true;
-        pause = true;
-        pauseStart = System.currentTimeMillis();
-    }
-
-    public void stopDataSaver() {
-        work = false;
-        pause = false;
-    }
-
-    public void setWork(boolean aWork) {
-        this.work = aWork;
-    }
-
-    public boolean isWork() {
-        return work;
-    }
-
-    public void setPause(boolean aWork) {
-        this.work = aWork;
-    }
-
-    public boolean isPause() {
-        return work;
-    }
-
-    public static class HrData {
+    public static class TestData {
         private int heartRate = -1;
         private long time = -1;
+        private int load;
+        private float lactate;
 
-        public HrData(long aTime, int aHr) {
+        public TestData(long aTime, int aHr) {
             this.time = aTime;
             this.heartRate = aHr;
         }
 
-        public void setHr(int aHr) {
+        public TestData(long aTime, int aHr, int aLoad) {
+            this.time = aTime;
+            this.heartRate = aHr;
+            this.load = aLoad;
+        }
+
+        public void setHeartRate(int aHr) {
             this.heartRate = aHr;
         }
 
-        public int getHr() {
+        public int getHeartRate() {
             return heartRate;
         }
 
@@ -137,6 +67,22 @@ public class DataSaver extends Thread {
 
         public long getTime() {
             return time;
+        }
+
+        public int getLoad() {
+            return load;
+        }
+
+        public float getLactate() {
+            return lactate;
+        }
+
+        public void setLoad(int load) {
+            this.load = load;
+        }
+
+        public void setLactate(float lactate) {
+            this.lactate = lactate;
         }
     }
 
