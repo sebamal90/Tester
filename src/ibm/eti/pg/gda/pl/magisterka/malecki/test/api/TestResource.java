@@ -30,13 +30,17 @@ public class TestResource {
     }
 
     public void resumeTest() {
-        testController.pauseTest();
+        testController.resumeTest();
         testStatus = true;
+    }
+
+    public void endTest() {
+        testController.endTest();
+        testStatus = false;
     }
 
     public void stopTest() {
         testController.stopTest();
-        testStatus = false;
     }
 
     public boolean isTestStatus() {

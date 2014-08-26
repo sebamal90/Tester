@@ -228,6 +228,7 @@ public class Main {
             messageResource.stopRead();
             monitor.monitorUpdaterStop();
             frame.dispose();
+            //System.exit(0);
         }
     }
 

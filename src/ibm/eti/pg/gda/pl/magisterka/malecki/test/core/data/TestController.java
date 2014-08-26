@@ -39,27 +39,20 @@ public class TestController extends Thread {
         while (work) {
             long now = timer.getTime();
             if (now - lastTime >= 2000) {
-                 dataSaver.addData(now,
+                dataSaver.addData(now,
                          main.getMessageResource().getHR(), 100);
 
-                lastTime = now;
+                lastTime = (now/1000)*1000;
             }
 
-            while (pause) {
+            do {
                try {
-                  Thread.sleep(500);
+                  Thread.sleep(200);
                } catch (InterruptedException ex) {
                    Logger.getLogger(DataSaver.class.getName()).
                            log(Level.SEVERE, null, ex);
                }
-            }
-
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(DataSaver.class.getName()).
-                        log(Level.SEVERE, null, ex);
-            }
+            } while(pause);
         }
     }
 
@@ -76,9 +69,7 @@ public class TestController extends Thread {
     }
 
     public void stopTest() {
-        work = false;
-        pause = false;
-        timer.pause();
+        //stop test, start recovery phase
     }
 
     public long getTime() {
@@ -87,6 +78,12 @@ public class TestController extends Thread {
 
     public List<TestData> getTestDatas() {
         return dataSaver.getTestDatas();
+    }
+
+    public void endTest() {
+        work = false;
+        pause = false;
+        timer.pause();
     }
 
 }

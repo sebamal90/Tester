@@ -47,11 +47,15 @@ public class Menu extends JPanel {
                         System.out.println("Don't connected with hr Listener");
                     } else {
                         testResource.startTest();
-                        startStopButton.setText(Config.labels.getString("Menu.end"));
+                        startStopButton.setText(Config.labels.getString("Menu.stop"));
                         pauseResumeButton.setEnabled(true);
                     }
+                } else if (action.equals(Config.labels.getString("Menu.stop"))) {
+                    testResource.stopTest();
+                    startStopButton.setText(Config.labels.getString("Menu.end"));
                 } else if (action.equals(Config.labels.getString("Menu.end"))) {
-                    main.closeApp();
+                    testResource.endTest();
+                    startStopButton.setEnabled(false);
                 } else if (action.equals(Config.labels.getString("Menu.pause"))) {
                     testResource.pauseTest();
                     pauseResumeButton.setText(Config.labels.getString("Menu.resume"));
