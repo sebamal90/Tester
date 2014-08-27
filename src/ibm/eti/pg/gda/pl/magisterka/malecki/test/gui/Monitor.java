@@ -146,7 +146,6 @@ public class Monitor extends JPanel {
 
         @Override
         public void run() {
-            int tmpCount = 0;
             while (work) {
                 clockLabel.setText(dateFormat.format(new Date()));
                 if (messageResource.isReading()) {
@@ -157,10 +156,9 @@ public class Monitor extends JPanel {
                 }
                 if (testResource.isTestStatus()) {
                     timeLabel.setText(testResource.getTimer());
-                    powerLabel.setText(tmpCount + "W");
+                    powerLabel.setText(testResource.getLoad() + "W");
                 }
 
-                tmpCount++;
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException ex) {

@@ -5,6 +5,7 @@
 
 package ibm.eti.pg.gda.pl.magisterka.malecki.test.core.data;
 
+import ibm.eti.pg.gda.pl.magisterka.malecki.test.api.MessageResource;
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.core.data.DataSaver.TestData;
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.gui.Main;
 import java.util.List;
@@ -22,27 +23,32 @@ public class TestController extends Thread {
     private Main main;
     private boolean work = true;
     private boolean pause = false;
+    private final MessageResource messageResource;
+    private Phase phase;
 
     public TestController(Main aMain) {
         main = aMain;
+        messageResource = main.getMessageResource();
         timer = new Timer();
         dataSaver = new DataSaver();
     }
 
     @Override
     public void run() {
-        Long startTime = System.currentTimeMillis();
-        timer.start(startTime);
-        dataSaver.addData(0, main.getMessageResource().getHR(), 0);
+        timer.start();
+        dataSaver.addData(0, messageResource.getHR(), 0);
         long lastTime = timer.getTime();
+        phase = new Phase(1, 0, protocol.getWaitTime(), 0);
 
         while (work) {
-            long now = timer.getTime();
+            long now = (timer.getTime() / 100) * 100;
             if (now - lastTime >= 2000) {
+                if (phase.getEndTime() <= now) {
+                    nextPhase(now);
+                }
                 dataSaver.addData(now,
-                         main.getMessageResource().getHR(), 100);
-
-                lastTime = (now/1000)*1000;
+                     messageResource.getHR(), phase.getLoad());
+                lastTime = now;
             }
 
             do {
@@ -54,6 +60,20 @@ public class TestController extends Thread {
                }
             } while(pause);
         }
+    }
+
+    private void nextPhase(long now) {
+        if (phase.getPhaseId() >= 2) {
+            phase = new Phase(phase.getPhaseId() + 1, now,
+                    protocol.getStepTime(),
+                    phase.getLoad() + protocol.getStepPower());
+        } else if (phase.getPhaseId() > 0) {
+            phase = new Phase(2, now, protocol.getWarmupTime(), protocol.getStartPower());
+        }
+    }
+
+    public int getLoad() {
+        return phase.getLoad();
     }
 
     public void resumeTest() {
@@ -69,7 +89,8 @@ public class TestController extends Thread {
     }
 
     public void stopTest() {
-        //stop test, start recovery phase
+        phase = new Phase(0, (timer.getTime() / 100) * 100,
+                protocol.getRecovery(), 0);
     }
 
     public long getTime() {

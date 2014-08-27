@@ -5,8 +5,8 @@ public class Timer {
     private long pauseTime = 0;
     private long startTime;
 
-    public void start(Long aStartTime) {
-        startTime = aStartTime;
+    public void start() {
+        startTime = System.currentTimeMillis();
     }
 
     public void pause() {

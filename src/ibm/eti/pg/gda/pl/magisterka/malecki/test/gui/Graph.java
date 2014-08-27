@@ -282,8 +282,7 @@ public final class Graph extends JPanel
                     }
                     series[0].addOrUpdate(regulartime,
                                           dataList.get(i).getHeartRate());
-                    series[1].addOrUpdate(regulartime,
-                                          dataList.get(i).getLoad());
+                    series[1].addOrUpdate(regulartime, dataList.get(i).getLoad());
                 }
             }
         }

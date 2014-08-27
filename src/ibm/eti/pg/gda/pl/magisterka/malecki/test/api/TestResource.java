@@ -69,4 +69,8 @@ public class TestResource {
     public List<TestData> getDatas()  {
         return testController.getTestDatas();
     }
+
+    public int getLoad() {
+        return testController.getLoad();
+    }
 }

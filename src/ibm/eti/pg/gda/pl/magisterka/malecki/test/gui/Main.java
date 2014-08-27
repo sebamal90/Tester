@@ -224,7 +224,7 @@ public class Main {
             if (menu.getGraph()  != null) {
                 menu.getGraph().stop();
             }
-            testResource.stopTest();
+            testResource.endTest();
             messageResource.stopRead();
             monitor.monitorUpdaterStop();
             frame.dispose();

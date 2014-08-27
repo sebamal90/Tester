@@ -21,7 +21,7 @@ public class DataTableModel extends AbstractTableModel {
     public DataTableModel(List<TestData> aDatas) {
         super();
         this.datas = aDatas;
-        columns = new String[]{"Time", "Hr"};
+        columns = new String[]{"Time", "Hr", "Load"};
     }
 
     public void setDataTableModel(List<TestData> aDatas) {
@@ -49,6 +49,9 @@ public class DataTableModel extends AbstractTableModel {
             case 1:
                 value = data.getHeartRate();
                 break;
+            case 2:
+                value = data.getLoad();
+                break;
             default:
                 break;
         }
@@ -71,6 +74,11 @@ public class DataTableModel extends AbstractTableModel {
                 oldValue = String.valueOf(data.getHeartRate());
                 data.setHeartRate(Integer.parseInt((String) value));
                 newValue = String.valueOf(data.getHeartRate());
+                break;
+            case 2:
+                oldValue = String.valueOf(data.getLoad());
+                data.setLoad(Integer.parseInt((String) value));
+                newValue = String.valueOf(data.getLoad());
                 break;
             default:
                 break;

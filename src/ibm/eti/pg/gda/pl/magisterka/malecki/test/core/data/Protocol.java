@@ -9,13 +9,13 @@ package ibm.eti.pg.gda.pl.magisterka.malecki.test.core.data;
  * @author SebaTab
  */
 public class Protocol {
-    private int waitTime = 60;
-    private int warmupTime = 300;
-    private int stepTime = 180;
-    private int startPower;
+    private int waitTime = 6000;
+    private int warmupTime = 30000;
+    private int stepTime = 18000;
+    private int startPower = 100;
     private int stepPower = 40;
     private int rpm = 80;
-    private int recovery = 300;
+    private int recovery = 30000;
 
     public Protocol() {
         //not implemented yet
