@@ -2,6 +2,7 @@ package ibm.eti.pg.gda.pl.magisterka.malecki.test.api;
 
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.core.data.DataSaver;
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.core.data.DataSaver.TestData;
+import ibm.eti.pg.gda.pl.magisterka.malecki.test.core.data.Protocol;
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.core.data.TestController;
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.gui.Main;
 import java.util.ArrayList;
@@ -72,5 +73,9 @@ public class TestResource {
 
     public int getLoad() {
         return testController.getLoad();
+    }
+
+    public void setProtocol(Protocol protocol) {
+        testController.setProtocol(protocol);
     }
 }

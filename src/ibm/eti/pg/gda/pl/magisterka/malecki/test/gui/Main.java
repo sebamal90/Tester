@@ -4,12 +4,14 @@
  */
 package ibm.eti.pg.gda.pl.magisterka.malecki.test.gui;
 
+import ibm.eti.pg.gda.pl.magisterka.malecki.test.gui.dialogs.Properties;
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.api.BTDeviceResource;
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.api.MessageResource;
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.api.TestResource;
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.core.Config;
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.core.MessageConsole;
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.core.device.Message;
+import ibm.eti.pg.gda.pl.magisterka.malecki.test.gui.dialogs.NewTest;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -125,6 +127,8 @@ public class Main {
                     closeApp();
                 } else if (action.equals(Config.labels.getString("Main.properties"))) {
                     new Properties(main, true);
+                } else if (action.equals(Config.labels.getString("Main.new"))) {
+                    new NewTest(main, true);
                 }
             }
         };

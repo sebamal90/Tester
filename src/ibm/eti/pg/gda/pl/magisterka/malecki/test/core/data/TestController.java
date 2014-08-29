@@ -17,7 +17,7 @@ import java.util.logging.Logger;
  * @author SebaTab
  */
 public class TestController extends Thread {
-    private Protocol protocol = new Protocol();
+    private Protocol protocol;
     private Timer timer;
     private DataSaver dataSaver;
     private Main main;
@@ -105,6 +105,10 @@ public class TestController extends Thread {
         work = false;
         pause = false;
         timer.pause();
+    }
+
+    public void setProtocol(Protocol aProtocol) {
+        protocol = aProtocol;
     }
 
 }

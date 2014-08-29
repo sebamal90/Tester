@@ -3,9 +3,10 @@
  * and open the template in the editor.
  */
 
-package ibm.eti.pg.gda.pl.magisterka.malecki.test.gui;
+package ibm.eti.pg.gda.pl.magisterka.malecki.test.gui.dialogs;
 
 import ibm.eti.pg.gda.pl.magisterka.malecki.test.core.Config;
+import ibm.eti.pg.gda.pl.magisterka.malecki.test.gui.Main;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Toolkit;
