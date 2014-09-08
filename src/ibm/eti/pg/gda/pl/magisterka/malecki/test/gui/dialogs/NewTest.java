@@ -30,8 +30,8 @@ public class NewTest extends JDialog {
         super(aMain.getFrame(), modal);
         main = aMain;
         setLayout(new FlowLayout());
-        setPreferredSize(new Dimension(500, 430));
-        setSize(new Dimension(500, 430));
+        setPreferredSize(new Dimension(500, 450));
+        setSize(new Dimension(500, 450));
         final Toolkit toolkit = Toolkit.getDefaultToolkit();
         final Dimension screenSize = toolkit.getScreenSize();
         final int x = (screenSize.width - getWidth()) / 2;
@@ -40,7 +40,7 @@ public class NewTest extends JDialog {
         setResizable(false);
 
         add(new PersonSettings());
-
+        setTitle("Person data");
 
         pack();
         setVisible(true);
@@ -61,7 +61,7 @@ public class NewTest extends JDialog {
         private JTextField labMore = new JTextField();
 
         public PersonSettings() {
-            setPreferredSize(new Dimension(450, 400));
+            setPreferredSize(new Dimension(450, 450));
             setLayout(new FlowLayout(FlowLayout.LEFT));
 
             addLabeli18l("name", 100);
@@ -90,6 +90,10 @@ public class NewTest extends JDialog {
             sep.setPreferredSize(new Dimension(400, 5));
             add(sep);
 
+            addLabeli18l("BodyMassIndex", 100);
+            addField(labBMI, false, 100);
+            addLabel("", 200);
+
             addLabeli18l("fat", 100);
             addField(labFatKg, false, 100);
             addLabel("kg", 200);
@@ -107,7 +111,13 @@ public class NewTest extends JDialog {
             valid.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    validateData();
+                    if (validateData()) {
+                        calcBMI();
+                        if (!labFat.getText().equals("")) {
+                            calcFat();
+                            calcFFM();
+                        }
+                    };
                 }
             });
             add(valid);
@@ -180,7 +190,7 @@ public class NewTest extends JDialog {
                 labWeigh.setBorder(new LineBorder(Color.RED));
             } else {
                 try {
-                    Integer.parseInt(labWeigh.getText());
+                    Double.parseDouble(labWeigh.getText().replace(',', '.'));
                 } catch (NumberFormatException ex) {
                     isValid = false;
                     labWeigh.setBorder(new LineBorder(Color.RED));
@@ -189,7 +199,7 @@ public class NewTest extends JDialog {
 
             if (!labFat.getText().equals("")) {
                 try {
-                    Float.parseFloat(labFat.getText());
+                    Double.parseDouble(labFat.getText().replace(',', '.'));
                 } catch (NumberFormatException ex) {
                     isValid = false;
                     labFat.setBorder(new LineBorder(Color.RED));
@@ -197,6 +207,30 @@ public class NewTest extends JDialog {
             }
 
             return isValid;
+        }
+
+        private void calcBMI() {
+            double bmi = Double.parseDouble(labWeigh.getText().replace(',', '.')) /
+                    Math.pow(Double.parseDouble(labHeight.getText().replace(',', '.')) / 100, 2);
+            bmi = ((double) (int)(bmi * 100)) / 100;
+            labBMI.setText(String.valueOf(bmi));
+        }
+
+        private void calcFat() {
+            double fat = Double.parseDouble(labFat.getText().replace(',', '.'));
+            double fatkg = Double.parseDouble(labWeigh.getText().replace(',', '.')) * (fat / 100);
+            fatkg = ((double) (int)(fatkg * 100)) / 100;
+            labFatKg.setText(String.valueOf(fatkg));
+        }
+
+        private void calcFFM() {
+            double fat = Double.parseDouble(labFat.getText().replace(',', '.'));
+            double ffm = 100 - fat;
+            labFFM.setText(String.valueOf(ffm));
+
+            double ffmkg = Double.parseDouble(labWeigh.getText().replace(',', '.')) * (ffm / 100);
+            ffmkg = ((double) (int)(ffmkg * 100)) / 100;
+            labFFMKg.setText(String.valueOf(ffmkg));
         }
     }
 
